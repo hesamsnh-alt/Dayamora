@@ -1,0 +1,39 @@
+'use strict';
+window.ProductEditor={
+ mount(form,p){
+  const root=form.querySelector('#productOptionsEditor'),copy=x=>JSON.parse(JSON.stringify(x));
+  const model=copy(p.options||{});model.colors=model.colors||[];model.sizeGuide=model.sizeGuide||{body:[],garment:[],note:''};let videoData=null;
+  const variants=()=>[...new Set(form.elements.variants.value.split(/[,،]/).map(v=>v.trim()).filter(Boolean))];
+  const fields=[['bust','دور سینه'],['waist','دور کمر'],['hips','دور باسن'],['length','قد / طول'],['shoulder','سرشانه'],['sleeve','آستین']];
+  const total=()=>model.colors.reduce((s,c)=>s+variants().reduce((n,v)=>n+Number(c.stock[v]||0),0),0);
+  function updateTotal(){if(model.colors.length){form.elements.stock.value=total();form.elements.stock.readOnly=true}else form.elements.stock.readOnly=false}
+  function table(kind,label){return`<details class="editor-guide"><summary>${label} — سانتی‌متر</summary><div class="table-scroll"><table><thead><tr><th>سایز</th>${fields.map(f=>`<th>${f[1]}</th>`).join('')}</tr></thead><tbody>${variants().map(v=>{const row=(model.sizeGuide[kind]||[]).find(r=>r.size===v)||{};return`<tr><th>${Daya.escape(v)}</th>${fields.map(([f,label])=>`<td><input aria-label="${Daya.escape(label+' '+v+' '+kind)}" data-guide="${kind}" data-size="${Daya.escape(v)}" data-field="${f}" value="${Daya.escape(row[f]||'')}" placeholder="مثلاً 82-86" maxlength="30" inputmode="decimal" dir="ltr"></td>`).join('')}</tr>`}).join('')}</tbody></table></div></details>`}
+  function render(){const E=Daya.escape;root.innerHTML=`<h3>رنگ‌بندی و موجودی</h3><p class="portal-form-note">برای هر رنگ، موجودی هر سایز / مدل را وارد کن. موجودی کل از جمع این جدول محاسبه می‌شود. بدون رنگ‌بندی، موجودی کل قبلی استفاده می‌شود.</p><div class="color-edit-list">${model.colors.map((c,i)=>`<fieldset class="color-editor" data-color-row="${i}"><legend>رنگ ${i+1}</legend><div class="form-row"><label>نام رنگ<input data-color="${i}" data-field="name" value="${E(c.name)}" maxlength="60" required placeholder="مثلاً مشکی"></label><label>نمونه رنگ<input type="color" data-color="${i}" data-field="hex" value="${E(c.hex)}" aria-label="نمونه رنگ ${i+1}"></label></div><div class="stock-matrix">${variants().map(v=>`<label>${E(v)}<input type="number" min="0" max="1000000" step="1" required value="${c.stock[v]||0}" data-color="${i}" data-size="${E(v)}" aria-label="موجودی ${E(c.name||'رنگ '+(i+1))} ${E(v)}"></label>`).join('')}</div><div class="color-photo">${c.imageUrl||c.preview?`<img src="${E(c.preview||c.imageUrl)}" alt="عکس این رنگ">`:''}<label>عکس اختصاصی این رنگ — اختیاری<input type="file" accept="image/jpeg,image/png,image/webp" data-color-photo="${i}"></label><button type="button" class="small-button" data-clear-photo="${i}">حذف عکس رنگ</button></div><button type="button" class="small-button danger" data-remove-color="${i}">حذف این رنگ</button></fieldset>`).join('')}</div><button class="small-button" type="button" id="addProductColor">افزودن رنگ +</button><section id="sizeGuideEditor" ${form.elements.cat.value!=='پوشاک'?'hidden':''}><h3>راهنمای سایز لباس</h3><p class="portal-form-note">اندازه‌های واقعی همین محصول یا برند را وارد کن. خانه‌های خالی نمایش داده نمی‌شوند. اعداد انگلیسی؛ مثل 72 یا 82-86.</p>${table('body','جدول اندازهٔ بدن')}${table('garment','جدول اندازهٔ لباس')}<label>توضیح اندازه‌گیری<textarea id="sizeGuideNote" maxlength="1000">${E(model.sizeGuide.note||'')}</textarea></label></section><section class="video-editor"><h3>معرفی ویدیویی محصول</h3><label>ویدیوی کوتاه MP4 / WebM<input id="productVideo" type="file" accept="video/mp4,video/webm"></label><p class="portal-form-note">آپلود مستقیم تا ۳ مگابایت. برای ویدیوی بزرگ‌تر لینک مستقیم HTTPS به فایل MP4 / WebM وارد کن.</p><label>لینک مستقیم ویدیو<input id="productVideoUrl" type="text" inputmode="url" value="${E(model.videoUrl||'')}" dir="ltr" maxlength="1500" placeholder="https://…/video.mp4"></label><label>متن همراه ویدیو<textarea id="productVideoCaption" maxlength="1000">${E(model.videoCaption||'')}</textarea></label><p id="videoUploadNote" class="portal-form-note">${model.videoUrl?'ویدیو ثبت شده است.':videoData?'ویدیوی جدید آمادهٔ ذخیره است.':'ویدیو اختیاری است.'}</p><button type="button" class="small-button danger" id="removeProductVideo">حذف ویدیو</button></section><p id="optionsEditorError" class="form-error" role="alert"></p>`;updateTotal();}
+  root.addEventListener('input',e=>{
+   const d=e.target.dataset;
+   if(d.color!==undefined){const c=model.colors[Number(d.color)];if(d.size!==undefined)c.stock[d.size]=Number(e.target.value);else c[d.field]=e.target.value;updateTotal()}
+   if(d.guide){const list=model.sizeGuide[d.guide]||(model.sizeGuide[d.guide]=[]);let row=list.find(r=>r.size===d.size);if(!row){row={size:d.size};list.push(row)}row[d.field]=e.target.value.replace(/[۰-۹٠-٩]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.includes(c)?'۰۱۲۳۴۵۶۷۸۹'.indexOf(c):'٠١٢٣٤٥٦٧٨٩'.indexOf(c)))}
+   if(e.target.id==='sizeGuideNote')model.sizeGuide.note=e.target.value;
+   if(e.target.id==='productVideoUrl')model.videoUrl=e.target.value;
+   if(e.target.id==='productVideoCaption')model.videoCaption=e.target.value;
+  });
+  root.addEventListener('change',async e=>{try{
+   if(e.target.dataset.colorPhoto!==undefined){const c=model.colors[Number(e.target.dataset.colorPhoto)];if(e.target.files[0]){c.preview=await Daya.fileData(e.target.files[0]);render()}}
+   if(e.target.id==='productVideo'&&e.target.files[0]){const file=e.target.files[0];if(!['video/mp4','video/webm'].includes(file.type)||file.size>3*1024*1024)throw new Error('ویدیو باید MP4 یا WebM و حداکثر ۳ مگابایت باشد. برای فایل بزرگ‌تر لینک مستقیم بدهید.');videoData=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('ویدیو خوانده نشد.'));reader.readAsDataURL(file)});model.videoUrl='';render()}
+  }catch(err){root.querySelector('#optionsEditorError').textContent=err.message;e.target.value=''}});
+  root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+   if(b.id==='addProductColor'){if(model.colors.length>=20)return;model.colors.push({id:crypto.randomUUID(),name:'',hex:'#e91e85',imageUrl:'',stock:Object.fromEntries(variants().map(v=>[v,0]))});render()}
+   if(b.dataset.removeColor!==undefined){model.colors.splice(Number(b.dataset.removeColor),1);render()}
+   if(b.dataset.clearPhoto!==undefined){const c=model.colors[Number(b.dataset.clearPhoto)];c.preview='';c.imageUrl='';render()}
+   if(b.id==='removeProductVideo'){videoData=null;model.videoUrl='';model.videoCaption='';render()}
+  });
+  form.elements.variants.addEventListener('change',render);form.elements.cat.addEventListener('change',render);render();
+  return{async collect(){
+   const output=copy(model),vs=variants();
+   for(const c of output.colors){c.stock=Object.fromEntries(vs.map(v=>[v,Number(c.stock[v]||0)]));if(c.preview){const r=await Daya.api('/api/admin/upload',{method:'POST',body:JSON.stringify({base64:c.preview})});c.imageUrl=r.imageUrl}delete c.preview}
+   for(const k of ['body','garment'])output.sizeGuide[k]=form.elements.cat.value==='پوشاک'?(output.sizeGuide[k]||[]).filter(r=>vs.includes(r.size)&&fields.some(([f])=>r[f])):[];
+   if(videoData){const r=await Daya.api('/api/admin/video',{method:'POST',body:JSON.stringify({base64:videoData})});output.videoUrl=r.videoUrl}
+   return{options:output,stock:output.colors.length?total():Number(form.elements.stock.value)};
+  }};
+ }
+};

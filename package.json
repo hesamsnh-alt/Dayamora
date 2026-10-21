@@ -1,13 +1,13 @@
 {
   "name": "dayamora-store",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "private": true,
   "scripts": {
     "dev": "node server.cjs",
     "start": "node server.cjs",
     "dev:local": "node server-sqlite.cjs",
     "db:init": "node scripts/db-init.cjs",
-    "test": "node --test tests/unit.test.cjs tests/campaign.test.cjs tests/cloud.test.cjs",
+    "test": "node --test tests/unit.test.cjs tests/campaign.test.cjs tests/cloud.test.cjs tests/options.test.cjs",
     "test:local": "node --test tests/integration.test.cjs",
     "build": "node scripts/check-build.cjs"
   },
