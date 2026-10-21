@@ -1,9 +1,9 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {validateProduct}=require('../lib/validation.cjs'),{validateBank}=require('../lib/options-validation.cjs'),{adjust,checkCart}=require('../lib/inventory.cjs'),Catalog=require('../public/catalog-options.js');
-const product=()=>validateProduct({name:'لباس',brand:'Daya',cat:'پوشاک',price:100,stock:0,variants:['S','M'],imageUrl:'/assets/blazer.webp',options:{colors:[{id:'red',name:'قرمز',hex:'#ff0000',stock:{S:2,M:0}},{id:'blue',name:'آبی',hex:'#0000ff',stock:{S:1,M:3}}],sizeGuide:{body:[{size:'S',bust:'82-86'}]},videoUrl:'https://media.example.test/intro.mp4'}});
+const product=()=>validateProduct({name:'لباس',brand:'Daya',cat:'پوشاک',price:100,stock:0,variants:['S','M'],imageUrl:'/assets/blazer.webp',options:{colors:[{id:'red',name:'قرمز',hex:'#ff0000',stock:{S:2,M:0}},{id:'blue',name:'آبی',hex:'#0000ff',stock:{S:1,M:3}}],sizeGuide:{body:[{size:'S',bust:'82-86',upperBust:'78-82',height:'160-165'}]},videoUrl:'https://media.example.test/intro.mp4'}});
 test('Color inventory is derived and isolated per size; confirmation/cancellation reverses exact quantities',()=>{
- const p={id:1,...product()},items=[{id:1,variant:'S',colorId:'red',qty:1},{id:1,variant:'S',colorId:'blue',qty:1}];assert.equal(p.stock,6);assert.notEqual(Catalog.key(items[0]),Catalog.key(items[1]));
+ const p={id:1,...product()},items=[{id:1,variant:'S',colorId:'red',qty:1},{id:1,variant:'S',colorId:'blue',qty:1}];assert.equal(p.stock,6);assert.equal(p.options.sizeGuide.body[0].upperBust,'78-82');assert.equal(p.options.sizeGuide.body[0].height,'160-165');assert.notEqual(Catalog.key(items[0]),Catalog.key(items[1]));
  const reserved=adjust(structuredClone(p),items,-1);assert.equal(reserved.stock,4);assert.equal(reserved.options.colors[0].stock.S,1);assert.equal(reserved.options.colors[1].stock.S,0);
  const restored=adjust(reserved,items,1);assert.deepEqual(restored,p);
  assert.throws(()=>checkCart(p,[{id:1,variant:'M',colorId:'red',qty:1}]),{status:409});
