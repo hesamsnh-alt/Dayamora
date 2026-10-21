@@ -1,14 +1,25 @@
 {
   "name": "dayamora-store",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "private": true,
-  "description": "Dayamora storefront, customer club and local SQLite admin",
   "scripts": {
     "dev": "node server.cjs",
     "start": "node server.cjs",
-    "test": "node --test tests/integration.test.cjs"
+    "dev:local": "node server-sqlite.cjs",
+    "db:init": "node scripts/db-init.cjs",
+    "test": "node --test tests/unit.test.cjs tests/campaign.test.cjs tests/cloud.test.cjs",
+    "test:local": "node --test tests/integration.test.cjs",
+    "build": "node scripts/check-build.cjs"
   },
   "engines": {
-    "node": ">=18.17"
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1154.0",
+    "@neondatabase/serverless": "1.2.0",
+    "@smithy/node-http-handler": "4.12.1",
+    "dotenv": "17.2.3",
+    "https-proxy-agent": "7.0.6",
+    "ws": "8.22.0"
   }
 }

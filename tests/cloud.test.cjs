@@ -1,0 +1,67 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawn}=require('node:child_process');
+const ROOT=path.resolve(__dirname,'..'),DATA=fs.mkdtempSync(path.join(os.tmpdir(),'dayamora-check-')),PORT=3874,BASE=`http://127.0.0.1:${PORT}`;
+const suffix=Date.now().toString(36);let productCount=6;let proc;let logs='';
+async function start(){proc=spawn(process.execPath,['server.cjs'],{cwd:ROOT,env:{...process.env,DAYAMORA_DATA_DIR:DATA,PORT:String(PORT)},stdio:['ignore','pipe','pipe']});proc.stdout.on('data',b=>logs+=b);proc.stderr.on('data',b=>logs+=b);for(let i=0;i<8;i++){try{const r=await fetch(BASE+'/api/health',{signal:AbortSignal.timeout(18000)});if(r.ok)return}catch{}await new Promise(r=>setTimeout(r,200))}throw new Error('Server did not start: '+logs)}
+async function stop(){if(proc&&proc.exitCode===null){await new Promise(resolve=>{proc.once('exit',resolve);proc.kill('SIGTERM')})}}
+function client(){let cookie='';return async(p,method='GET',data,headers={})=>{const r=await fetch(BASE+p,{method,signal:AbortSignal.timeout(45000),headers:{'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{}),...headers},...(data!==undefined?{body:JSON.stringify(data)}:{})});const set=r.headers.get('set-cookie');if(set)cookie=set.split(';')[0];const dataOut=await r.json();console.log('QA',method,p.replace(/[a-f0-9-]{20,}/g,'[id]'),r.status);return{status:r.status,data:dataOut,headers:r.headers}}}
+test('Neon persistence, account isolation, admin, orders, points, reviews and private images',{skip:!process.env.TEST_DATABASE_URL},async()=>{if(!process.env.TEST_DATABASE_URL.includes('ep-')||process.env.TEST_DATABASE_URL.includes('ep-little-credit-b4d0ijq9'))throw new Error('Use a disposable empty Dayamora test branch, never production');process.env.DATABASE_URL=process.env.TEST_DATABASE_URL;const {init}=require('../scripts/db-init.cjs');await init(process.env.TEST_DATABASE_URL);try{await start();const admin=client(),customer=client(),second=client(),anonymous=client();let r=await anonymous('/api/admin/dashboard');assert.equal(r.status,401);
+ r=await anonymous('/api/bootstrap');productCount=r.data.products.length;assert.ok(productCount>=6);
+ r=await admin('/api/setup','POST',{name:'Test owner',email:'other@example.com',password:'Test-owner-password!'});assert.equal(r.status,403);
+ const {handle}=require('../lib/api.cjs');let remote=await handle(new Request('https://dayamora.example/api/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Test owner',email:'hesamsnh@gmail.com',password:'Test-owner-password!'})}),{ip:'public-test',allowSetup:false});assert.equal(remote.status,403);
+ r=await admin('/api/setup','POST',{name:'Test owner',email:'hesamsnh@gmail.com',password:'Test-owner-password!'});if(r.status===409)r=await admin('/api/login','POST',{email:'hesamsnh@gmail.com',password:'Test-owner-password!'});assert.ok([200,201].includes(r.status));assert.equal(r.data.user.role,'admin');assert.ok(r.headers.get('set-cookie').includes('HttpOnly'));
+ r=await anonymous('/api/setup','POST',{name:'Attacker',email:'hesamsnh@gmail.com',password:'Other-password!'});assert.equal(r.status,409);
+ r=await customer('/api/register','POST',{name:'Customer A',email:`buyer-a-${suffix}@example.test`,password:'Customer-password!',role:'admin'});if(r.status===409)r=await customer('/api/login','POST',{email:`buyer-a-${suffix}@example.test`,password:'Customer-password!'});assert.ok([200,201].includes(r.status));const customerId=r.data.user.id;assert.equal(r.data.user.role,'customer');
+ r=await customer('/api/admin/dashboard');assert.equal(r.status,403);
+ r=await second('/api/register','POST',{name:'Customer B',email:`buyer-b-${suffix}@example.test`,password:'Customer-password!'});if(r.status===409)r=await second('/api/login','POST',{email:`buyer-b-${suffix}@example.test`,password:'Customer-password!'});assert.ok([200,201].includes(r.status));
+ r=await customer('/api/selections','PUT',{cart:[{id:3,variant:'قرمز',qty:2}],favorites:[1,3],preferences:{minPrice:1000000,maxPrice:5000000}});assert.equal(r.status,200);
+ r=await second('/api/me');assert.equal(r.data.state.cart.length,0);assert.equal(r.data.state.favorites.length,0);
+ r=await customer('/api/selections','PUT',{cart:[],favorites:[],preferences:{minPrice:8,maxPrice:2}});assert.equal(r.status,400);
+ r=await customer('/api/selections','PUT',{cart:[],favorites:[]},{Origin:'https://evil.example'});assert.equal(r.status,403);
+ r=await admin('/api/admin/upload','POST',{base64:'data:image/png;base64,'+Buffer.from('not an image').toString('base64')});assert.equal(r.status,400);
+ r=await admin('/api/admin/upload','POST',{base64:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jJb0AAAAASUVORK5CYII='});assert.equal(r.status,201);const image=r.data.imageUrl;console.log('QA: authentication and image upload passed');
+ r=await admin('/api/admin/products','POST',{name:'Test product',brand:'Dayamora',cat:'کیف',price:1250000,stock:4,variants:['Pink'],imageUrl:image,desc:'Test description',active:true});assert.equal(r.status,201);const pid=r.data.id;
+ r=await anonymous('/api/products');assert.ok(r.data.products.some(p=>p.id===pid));assert.equal(r.data.products.find(p=>p.id===pid).isSample,false);
+ r=await customer('/api/me','PUT',{name:'Customer A',phone:'+971000000000',address:'Test address'});assert.equal(r.status,200);
+ r=await customer('/api/orders','POST',{requestKey:'test-order-1234',cart:[{id:pid,variant:'Pink',qty:2}],favorites:[]});assert.equal(r.status,201);const oid=r.data.id;console.log('QA: order creation passed');
+ r=await customer('/api/orders','POST',{requestKey:'test-order-1234',cart:[{id:pid,variant:'Pink',qty:2}],favorites:[]});assert.equal(r.data.id,oid);
+ r=await admin('/api/admin/orders/'+oid,'PUT',{status:'completed',points:50});assert.equal(r.status,409);
+ const duplicateConfirms=await Promise.all([admin('/api/admin/orders/'+oid,'PUT',{status:'confirmed',points:0}),admin('/api/admin/orders/'+oid,'PUT',{status:'confirmed',points:0})]);assert.deepEqual(duplicateConfirms.map(r=>r.status),[200,200]);
+ r=await anonymous('/api/products');assert.equal(r.data.products.find(p=>p.id===pid).stock,2);
+ r=await admin('/api/admin/orders/'+oid,'PUT',{status:'completed',points:50});assert.equal(r.status,200);
+ r=await admin('/api/admin/orders/'+oid,'PUT',{status:'completed',points:50});assert.equal(r.status,200);
+
+ r=await second('/api/products/'+pid+'/reviews','POST',{rating:5,body:'Not a buyer'});assert.equal(r.status,403);
+ r=await customer('/api/products/'+pid+'/reviews','POST',{rating:5,body:'A real customer review'});assert.equal(r.status,200);
+ r=await anonymous('/api/products/'+pid);assert.equal(r.data.product.reviewCount,1);assert.equal(r.data.product.rating,5);assert.equal(r.data.reviews[0].body,'A real customer review');
+ r=await customer('/api/products/'+pid+'/reviews','POST',{rating:4,body:'Updated review'});assert.equal(r.status,200);
+ r=await anonymous('/api/products/'+pid);assert.equal(r.data.product.reviewCount,1);assert.equal(r.data.product.rating,4);
+ r=await admin('/api/admin/reviews');assert.equal(r.status,200);const reviewId=r.data.reviews.find(r=>r.product_id===pid).id;
+ r=await admin('/api/admin/reviews/'+reviewId,'PUT',{hidden:true});assert.equal(r.status,200);
+ r=await anonymous('/api/products/'+pid);assert.equal(r.data.product.reviewCount,0);assert.equal(r.data.reviews.length,0);
+ r=await admin('/api/admin/reviews/'+reviewId,'PUT',{hidden:false});assert.equal(r.status,200);
+ r=await customer('/api/wardrobe','POST',{name:'My test coat',cat:'پوشاک',base64:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jJb0AAAAASUVORK5CYII='});assert.equal(r.status,201);const wid=r.data.id,privateImage=r.data.imageUrl;
+ r=await customer('/api/closet');assert.equal(r.data.wardrobe.length,1);
+ const privateAnon=await fetch(BASE+privateImage);assert.equal(privateAnon.status,401);
+ r=await second('/api/wardrobe/'+wid,'DELETE',{});assert.equal(r.status,404);
+ r=await second('/api/styles','POST',{name:'Invalid private access',productIds:[],wardrobeIds:[wid]});assert.equal(r.status,400);
+ r=await customer('/api/styles','POST',{name:'My autumn style',productIds:[pid],wardrobeIds:[wid]});assert.equal(r.status,201);const styleId=r.data.id;console.log('QA: reviews and private wardrobe passed');
+ r=await customer('/api/styles/'+styleId,'PUT',{name:'Updated style',productIds:[pid],wardrobeIds:[wid]});assert.equal(r.status,200);
+ r=await second('/api/closet');assert.equal(r.data.styles.length,0);assert.equal(r.data.wardrobe.length,0);
+ r=await second('/api/styles/'+styleId,'DELETE',{});assert.equal(r.status,404);
+ r=await customer('/api/closet');assert.equal(r.data.styles[0].name,'Updated style');
+ r=await customer('/api/me');assert.equal(r.data.points,50);assert.equal(r.data.ledger.length,1);assert.equal(r.data.orders.length,1);
+ r=await admin('/api/admin/points','POST',{userId:customerId,delta:-100,reason:'Test'});assert.equal(r.status,400);
+ r=await admin('/api/admin/points','POST',{userId:customerId,delta:10,reason:'Test membership gift'});assert.equal(r.status,200);
+ r=await admin('/api/admin/customers/'+customerId);assert.equal(r.status,200);assert.equal(r.data.points,60);assert.equal(r.data.state.preferences.maxPrice,5000000);
+ r=await customer('/api/admin/points','POST',{userId:customerId,delta:9999,reason:'Unauthorized'});assert.equal(r.status,403);
+ r=await customer('/api/selections','PUT',{cart:[{id:pid,variant:'Pink',qty:1}],favorites:[pid],preferences:{minPrice:1000000,maxPrice:3000000}});assert.equal(r.status,200);
+ console.log('QA: points and ownership passed; checking persistence');await stop();await start();
+ r=await customer('/api/me');assert.equal(r.status,200);assert.equal(r.data.state.cart[0].id,pid);assert.equal(r.data.state.favorites[0],pid);assert.equal(r.data.state.preferences.maxPrice,3000000);assert.equal(r.data.points,60);r=await customer('/api/closet');assert.equal(r.data.styles.length,1);assert.equal(r.data.wardrobe.length,1);
+ const upload=await fetch(BASE+image);assert.equal(upload.status,200);assert.equal(upload.headers.get('content-type'),'image/png');
+ r=await admin('/api/admin/dashboard');assert.equal(r.data.products.length,productCount+1);
+ r=await customer('/api/logout','POST',{});assert.equal(r.status,200);r=await customer('/api/me');assert.equal(r.status,401);
+ r=await customer('/api/login','POST',{email:`buyer-a-${suffix}@example.test`,password:'Incorrect-password!'});assert.equal(r.status,401);
+ r=await customer('/api/login','POST',{email:`buyer-a-${suffix}@example.test`,password:'Customer-password!'});assert.equal(r.status,200);r=await customer('/api/wardrobe/'+wid,'DELETE',{});assert.equal(r.status,200);r=await customer('/api/styles/'+styleId,'DELETE',{});assert.equal(r.status,200);
+ for(const route of ['/','/admin','/club','/setup','/common.js','/portal.js','/assets/mascots/pose-14.webp','/budget','/product?id=3','/budget.js','/product.js']){const x=await fetch(BASE+route);assert.equal(x.status,200,route)}
+ const privateFile=await fetch(BASE+'/data/dayamora.sqlite');assert.equal(privateFile.status,404);
+ }finally{console.log(logs.slice(-2000));await stop();fs.rmSync(DATA,{recursive:true,force:true})}});

@@ -4,8 +4,8 @@ window.Daya={
  money(v){return Number(v).toLocaleString('fa-IR')+' تومان'},
  date(v){return new Date(v).toLocaleString('fa-IR')},
  status(v){return({pending:'در انتظار بررسی',confirmed:'تأییدشده',completed:'تکمیل‌شده',cancelled:'لغوشده'})[v]||v},
- async api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const d=await r.json();if(!r.ok){const e=new Error(d.error||'ارتباط با سرور ناموفق بود.');e.status=r.status;throw e}return d},
+ async api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const type=r.headers.get('content-type')||'';if(!type.includes('application/json'))throw new Error('بخش سرور فروشگاه منتشر نشده است؛ Build و Functions در Netlify را بررسی کنید.');const d=await r.json();if(!r.ok){const e=new Error(d.error||'ارتباط با سرور ناموفق بود.');e.status=r.status;throw e}return d},
  message(text,bad=false){const n=document.querySelector('#pageMessage');if(n){n.hidden=false;n.textContent=text;n.className='page-message'+(bad?' error':'')}},
  async logout(){await Daya.api('/api/logout',{method:'POST',body:'{}'});location.href='/'},
- async fileData(file){if(!file||file.size>4*1024*1024)throw new Error('عکس باید حداکثر ۴ مگابایت باشد.');return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('خواندن عکس ناموفق بود.'));r.readAsDataURL(file)})}
+ async fileData(file){if(!file||file.size>3*1024*1024)throw new Error('عکس باید حداکثر ۳ مگابایت باشد.');return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('خواندن عکس ناموفق بود.'));r.readAsDataURL(file)})}
 };

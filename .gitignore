@@ -1,5 +1,9 @@
-data/
 node_modules/
+data/
 .env
+.env.*
+!.env.example
 *.log
 .openai/
+.neon
+.netlify/

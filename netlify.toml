@@ -1,0 +1,48 @@
+[build]
+  command = "npm run build"
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+[[redirects]]
+  from = "/club"
+  to = "/club.html"
+  status = 200
+[[redirects]]
+  from = "/setup"
+  to = "/setup.html"
+  status = 200
+[[redirects]]
+  from = "/budget"
+  to = "/budget.html"
+  status = 200
+[[redirects]]
+  from = "/product"
+  to = "/product.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "same-origin"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+[[redirects]]
+  from = "/shop"
+  to = "/budget.html"
+  status = 200
+[[redirects]]
+  from = "/value"
+  to = "/budget.html"
+  status = 200
