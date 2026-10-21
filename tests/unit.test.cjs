@@ -26,3 +26,27 @@ test('API client distinguishes a crashed function from an absent route',async()=
     await assert.rejects(sandbox.window.Daya.api('/api/bootstrap'),e=>e.status===status&&expected.test(e.message));
   }
 });
+
+test('Upload errors identify the stage and hide credentials in messages and causes',async()=>{
+  const {storageFailure,safeMessage}=require('../lib/storage-errors.cjs');
+  const env={DAYAMORA_S3_ACCESS_KEY_ID:'test-access-identifier',DAYAMORA_S3_SECRET_ACCESS_KEY:'test-secret-value',DATABASE_URL:'postgresql://user:test-db-password@db.example/store'};
+  const sanitized=safeMessage(new Error('test-access-identifier test-secret-value test-db-password https://store.example/key?signature=secret'),env);
+  for(const secret of ['test-access-identifier','test-secret-value','test-db-password','https://store.example'])assert.ok(!sanitized.includes(secret));
+  for(const [name,expected] of [['InvalidAccessKeyId','InvalidAccessKeyId'],['SignatureDoesNotMatch','SignatureDoesNotMatch'],['AccessDenied','AccessDenied'],['NoSuchBucket','NoSuchBucket']]){
+    const original=Object.assign(new Error('Request rejected'),{name,$metadata:{httpStatusCode:403}});
+    const failure=storageFailure(original);assert.equal(failure.status,502);assert.equal(failure.diagnostic.stage,'storage.upload');assert.equal(failure.diagnostic.code,expected);assert.match(failure.message,new RegExp(expected));
+  }
+  assert.equal(storageFailure(new Error('Region is not a valid hostname component.')).diagnostic.code,'STORAGE_REGION_INVALID');
+  assert.equal(storageFailure(new Error('Invalid URL')).diagnostic.code,'STORAGE_ENDPOINT_INVALID');
+  const {S3Client}=require('@aws-sdk/client-s3'),storage=require('../lib/storage.cjs');
+  const originalSend=S3Client.prototype.send;
+  const keys=['DAYAMORA_S3_ENDPOINT','DAYAMORA_S3_REGION','DAYAMORA_S3_ACCESS_KEY_ID','DAYAMORA_S3_SECRET_ACCESS_KEY'];
+  const previous=Object.fromEntries(keys.map(k=>[k,process.env[k]]));
+  try{
+    Object.assign(process.env,{DAYAMORA_S3_ENDPOINT:'https://storage.example',DAYAMORA_S3_REGION:'us-east-2',DAYAMORA_S3_ACCESS_KEY_ID:env.DAYAMORA_S3_ACCESS_KEY_ID,DAYAMORA_S3_SECRET_ACCESS_KEY:env.DAYAMORA_S3_SECRET_ACCESS_KEY});
+    S3Client.prototype.send=async()=>{throw new Error('SDK error with test-secret-value',{cause:new Error('Cause with test-access-identifier')})};
+    await assert.rejects(storage.upload('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jJb0AAAAASUVORK5CYII='),e=>{
+      assert.equal(e.diagnostic.stage,'storage.upload');assert.ok(!JSON.stringify(e.diagnostic).includes('test-secret-value'));assert.ok(!JSON.stringify(e.diagnostic).includes('test-access-identifier'));assert.equal(e.status,502);return true;
+    });
+  }finally{S3Client.prototype.send=originalSend;for(const k of keys)if(previous[k]===undefined)delete process.env[k];else process.env[k]=previous[k]}
+});
