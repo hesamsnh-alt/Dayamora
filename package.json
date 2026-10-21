@@ -1,0 +1,14 @@
+{
+  "name": "dayamora-store",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Dayamora storefront, customer club and local SQLite admin",
+  "scripts": {
+    "dev": "node server.cjs",
+    "start": "node server.cjs",
+    "test": "node --test tests/integration.test.cjs"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}
