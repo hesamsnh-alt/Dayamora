@@ -7,7 +7,13 @@
   NODE_VERSION = "22"
 
 [functions]
+  directory = "netlify/functions"
   node_bundler = "esbuild"
+  # Keep Node-only dependencies in the function ZIP, including transitive files.
+  external_node_modules = ["@neondatabase/serverless", "ws", "https-proxy-agent", "@aws-sdk/client-s3", "@smithy/node-http-handler"]
+  # The mixed ESM/CommonJS graph can escape dependency tracing. Include installed
+  # production packages explicitly rather than relying only on tracing.
+  included_files = ["node_modules/**"]
 
 [[redirects]]
   from = "/admin"

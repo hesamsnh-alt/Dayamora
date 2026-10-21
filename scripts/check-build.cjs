@@ -1,5 +1,11 @@
 const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
+// Syntax checks alone passed even when the deployed API could not load its driver.
+// Fail the build before deployment if a production dependency is missing/broken.
+for(const dependency of Object.keys(require('../package.json').dependencies)){
+  try{require(dependency)}catch{throw new Error('Cannot load production dependency: '+dependency+'. Run npm ci before building.');}
+}
+require('../lib/api.cjs');
 for(const folder of ['public','lib','netlify/functions','scripts'])for(const name of fs.readdirSync(path.join(root,folder))){
   if(/\.(js|cjs|mjs)$/.test(name))execFileSync(process.execPath,['--check',path.join(root,folder,name)],{stdio:'inherit'});
 }
