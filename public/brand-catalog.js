@@ -8,9 +8,12 @@ const normalize=s=>valid(s)?(match(s)||String(s).trim()):'';
 const all=products=>[...names,...new Set((products||[]).map(p=>normalize(p.brand)).filter(Boolean).filter(b=>!match(b)))];
 /* Brand typography remains local; not a claim of official trademark artwork. */
 const iconSlugs={Nike:'nike',adidas:'adidas',Puma:'puma','New Balance':'newbalance',Converse:'converse',Vans:'vans',Reebok:'reebok',ASICS:'asics',Skechers:'skechers','Under Armour':'underarmour',Zara:'zara','H&M':'handm',Mango:'mango',Uniqlo:'uniqlo','Levi’s':'levis','Calvin Klein':'calvinklein','Tommy Hilfiger':'tommyhilfiger',Lacoste:'lacoste',Diesel:'diesel','The North Face':'thenorthface',Patagonia:'patagonia',Chanel:'chanel',Dior:'dior',Gucci:'gucci',Prada:'prada','Louis Vuitton':'louisvuitton',Versace:'versace',Burberry:'burberry',Valentino:'valentino',Givenchy:'givenchy',Fendi:'fendi',Coach:'coach','Michael Kors':'michaelkors','Ray-Ban':'rayban',Oakley:'oakley',Pandora:'pandora',Swarovski:'swarovski',Cartier:'cartier',Maybelline:'maybelline',Sephora:'sephora',NARS:'nars','The Ordinary':'theordinary',CeraVe:'cerave',Clinique:'clinique','Estée Lauder':'esteelauder',Garnier:'garnier',Dove:'dove',Nivea:'nivea',SHEIN:'shein',Apple:'apple',Samsung:'samsung',Xiaomi:'xiaomi',Spigen:'spigen',Anker:'anker',JBL:'jbl',Sony:'sony'};
-/* Logos load from Simple Icons when a corresponding brand icon is available.
-   Fallback initials remain readable even offline or if the icon source is unavailable. */
-const mark=name=>{const chars=String(name).split(/[ &.]+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').slice(0,3).toUpperCase().replace(/[^A-Z0-9]/g,'');const slug=iconSlugs[name];return '<span class="daya-brand-mark" aria-hidden="true">'+(slug?'<img src="https://cdn.simpleicons.org/'+slug+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<span>'+chars+'</span></span>'};
+/* Brand icon URLs use a versioned CDN. Images are hidden by default and
+   only revealed after successful load; failures never show a broken icon. */
+const mark=name=>{const chars=String(name).split(/[ &.]+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').slice(0,3).toUpperCase().replace(/[^A-Z0-9]/g,'');const slug=iconSlugs[name];return '<span class="daya-brand-mark" aria-hidden="true">'+(slug?'<img src="https://cdn.jsdelivr.net/npm/simple-icons@v15/icons/'+slug+'.svg" alt="" loading="lazy">':'')+'<span>'+chars+'</span></span>'};
+/* Inline onerror is blocked by strict CSPs, so use delegated listeners. */
+document.addEventListener('load',event=>{const img=event.target;if(img instanceof HTMLImageElement&&img.closest('.daya-brand-mark'))img.classList.add('daya-brand-loaded')},true);
+document.addEventListener('error',event=>{const img=event.target;if(img instanceof HTMLImageElement&&img.closest('.daya-brand-mark'))img.remove()},true);
 
 return {names,valid,normalize,all,mark};
 })();

@@ -12,3 +12,7 @@
 .brand-directory .daya-brand-mark{width:26px;height:26px}
 
 .daya-brand-mark{position:relative;overflow:hidden}.daya-brand-mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:5px;background:#fffdfa}.daya-brand-mark img:not([src]){display:none}
+
+/* Brand icon fallback: no broken image even if external CDN is blocked. */
+.daya-brand-mark img{visibility:hidden}
+.daya-brand-mark img.daya-brand-loaded{visibility:visible}
