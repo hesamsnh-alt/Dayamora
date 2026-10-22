@@ -1,0 +1,14 @@
+ONNX Runtime Web 1.22.0 — Microsoft, MIT.
+SCHP ATR-18 — Peike Li et al.; ONNX packaging by pirocheto, MIT.
+U2-Net portable — Xuebin Qin et al., Apache-2.0; rembg ONNX release mirror by edgetools.
+Model revision and SHA-256 are pinned in garment-worker.js. Models are downloaded on demand, not bundled.
+No generated replacement pixels are used; masks preserve visible source pixels.
+Clothing parsing model: U2NET cloth segmentation (levindabhi / rembg), MIT source; jellybox ONNX release card declares Apache-2.0. Weights at pinned jellybox revision. Preprocessing [-1,1], bidirectional inference masks.
+SHA-256 runtime fallback: js-sha256 0.11.1, MIT.
+Sources:
+https://github.com/levindabhi/cloth-segmentation
+https://huggingface.co/jellybox/u2net-cloth-seg
+https://huggingface.co/pirocheto/schp-atr-18
+https://huggingface.co/edgetools/u2netp
+https://github.com/microsoft/onnxruntime
+https://github.com/emn178/js-sha256

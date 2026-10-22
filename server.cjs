@@ -3,7 +3,7 @@ require('dotenv').config({quiet:true});
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {handle,headers}=require('./lib/api.cjs');
 const PUBLIC=path.join(__dirname,'public'),PORT=Number(process.env.PORT||3000);
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.mp4':'video/mp4','.webm':'video/webm'};
+const mime={'.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.mp4':'video/mp4','.webm':'video/webm'};
 const pages={'/':'/index.html','/admin':'/admin.html','/club':'/club.html','/setup':'/setup.html','/budget':'/budget.html','/shop':'/budget.html','/value':'/budget.html','/product':'/product.html'};
 if(!process.env.DATABASE_URL){console.error('DATABASE_URL is missing. Add it to .env. To use the separate old SQLite version: npm run dev:local');process.exit(1)}
 const server=http.createServer(async(req,res)=>{
