@@ -7,3 +7,5 @@ data/
 .openai/
 .neon
 .netlify/
+
+.outfit-backups/

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+<defs><linearGradient id="body" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#bba89c"/><stop offset=".3" stop-color="#ede3d8"/><stop offset=".58" stop-color="#fbf4e9"/><stop offset="1" stop-color="#c6b4a7"/></linearGradient><linearGradient id="head" x1="0" y1="0" x2="1" y2=".2"><stop stop-color="#c3b2a6"/><stop offset=".5" stop-color="#f5ebdf"/><stop offset="1" stop-color="#d7c7b9"/></linearGradient></defs>
+<ellipse cx="300" cy="865" rx="110" ry="13" fill="#43392c" opacity=".09"/>
+<!-- One coherent form: two arms, two legs, no duplicated anatomy. -->
+<path d="M260 451C245 487 250 549 257 606L265 744 267 815Q260 830 243 839Q236 849 258 852H286Q297 849 292 830L291 747 300 557 309 747 308 830Q303 849 314 852H342Q364 849 357 839Q340 830 333 815L335 744 343 606C350 549 355 487 340 451Z" fill="url(#body)" stroke="#bbab9e" stroke-width="1"/>
+<path d="M228 215C202 220 192 248 184 284L159 381 171 473Q172 486 180 486L189 479 184 384 218 306 237 278Z" fill="url(#body)" stroke="#c6b5a7"/>
+<path d="M372 215C398 220 408 248 416 284L441 381 429 473Q428 486 420 486L411 479 416 384 382 306 363 278Z" fill="url(#body)" stroke="#c6b5a7"/>
+<path d="M275 174L274 195Q257 206 228 215L233 280Q238 314 255 339L260 377Q256 415 249 451Q249 471 270 478Q300 485 330 478Q351 471 351 451Q344 415 340 377L345 339Q362 314 367 280L372 215Q343 206 326 195L325 174Z" fill="url(#body)" stroke="#bdae9f"/>
+<path d="M253 234Q275 224 300 236Q325 224 347 234M300 239V329M265 382Q300 390 335 382" fill="none" stroke="#b8a695" opacity=".22" stroke-width="1.4"/>
+<path d="M260 112Q260 68 300 66Q340 68 340 112L334 150Q326 179 300 185Q274 179 266 150Z" fill="url(#head)" stroke="#c9b8a8"/>
+<path d="M275 190Q300 203 325 190" stroke="#bba795" opacity=".35" fill="none"/>
+</svg>

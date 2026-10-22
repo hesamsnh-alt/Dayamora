@@ -10,6 +10,11 @@ const server=http.createServer(async(req,res)=>{
   try{
     const host=req.headers.host;if(!host||!['localhost','127.0.0.1'].includes(host.split(':')[0])){res.writeHead(403);return res.end('Invalid host')}
     const url=new URL(req.url,'http://'+host);
+    // DAYAMORA_OUTFIT_ROUTE: dedicated authenticated styling endpoint.
+    if(url.pathname.startsWith('/outfit-api/')){
+      const request=new Request(url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body:req,duplex:'half'}:{})});
+      const response=await require('./lib/outfits.cjs').handle(request);res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));
+    }
     if(url.pathname.startsWith('/api/')||/^\/(private-uploads|uploads)\//.test(url.pathname)){
       const request=new Request(url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body:req,duplex:'half'}:{})});
       const response=await handle(request,{ip:req.socket.remoteAddress,allowSetup:true});res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));

@@ -1,0 +1,3 @@
+'use strict';
+require('dotenv').config({quiet:true});const fs=require('node:fs'),path=require('node:path'),{withDatabase}=require('../lib/db.cjs');
+(async()=>{const sql=fs.readFileSync(path.join(__dirname,'../database/003-outfit-studio.sql'),'utf8');await withDatabase(true,async db=>{for(const statement of sql.split(';').map(x=>x.trim()).filter(Boolean))await db.run(statement)});console.log('Outfit storage ready. Existing products, orders and users were preserved.')})().catch(e=>{console.error(e.status?e.message:'Outfit storage could not be initialized; check the Dayamora database connection.');process.exitCode=1});
