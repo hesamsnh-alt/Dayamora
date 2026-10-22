@@ -20,9 +20,9 @@ const server=http.createServer(async(req,res)=>{
       const response=await handle(request,{ip:req.socket.remoteAddress,allowSetup:true});res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));
     }
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end()}
-    const name=pages[url.pathname]||decodeURIComponent(url.pathname),file=path.resolve(PUBLIC,'.'+name),relative=path.relative(PUBLIC,file);
+    const name=(/^\/discover\/[a-z]+$/.test(url.pathname)?'/discover.html':pages[url.pathname])||decodeURIComponent(url.pathname),file=path.resolve(PUBLIC,'.'+name),relative=path.relative(PUBLIC,file);
     if(relative.startsWith('..')||path.isAbsolute(relative)||relative.split(path.sep).some(p=>p.startsWith('.'))||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}
-    res.writeHead(200,{...headers,'Content-Type':mime[path.extname(file)]||'application/octet-stream'});if(req.method==='HEAD')return res.end();fs.createReadStream(file).pipe(res);
+    res.writeHead(200,{...headers,...(path.basename(file)==='discover.html'?{'Content-Security-Policy':headers['Content-Security-Policy'].replace("img-src 'self' data:","img-src 'self' data: blob:")}:{}),...(['garment-admin.html','garment-worker.js'].includes(path.basename(file))?{'Content-Security-Policy':require('./lib/static-policy.cjs').admin}:{}),'Content-Type':mime[path.extname(file)]||'application/octet-stream'});if(req.method==='HEAD')return res.end();fs.createReadStream(file).pipe(res);
   }catch{if(!res.headersSent)res.writeHead(500);res.end('Request failed')}
 });
 server.on('error',e=>{console.error(e.code==='EADDRINUSE'?'Port is busy. Stop the previous server with Ctrl+C.':e.code);process.exit(1)});

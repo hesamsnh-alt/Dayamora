@@ -19,11 +19,11 @@ test('Neon: owned looks persist exact sizes and geometry, with isolation and rev
  const reloaded=await req('looks/'+id);assert.equal(reloaded.data.look.layers[0].variant,'S');assert.equal(reloaded.data.look.layers[0].x,222);assert.equal((await req('looks')).data.looks[0].id,id);
  const {png}=require('./cutout-fixture.cjs');
  assert.equal((await req('cutouts','GET',null,'')).status,200);
- assert.equal((await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(),garmentOnly:true})).status,403);
+ assert.equal((await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(),garmentOnly:true,sourceImage:'/assets/blazer.webp'})).status,403);
  const adminToken=crypto.randomBytes(32).toString('hex');await withDatabase(true,async db=>{const admin=await db.one("SELECT id FROM users WHERE role='admin'");assert.ok(admin,'QA admin fixture missing');await db.run('INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)',[hash(adminToken),admin.id,Date.now()+600000])});
- assert.equal((await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(true),garmentOnly:true},adminToken)).status,400);
- assert.equal((await req('cutouts','POST',{productId:pid,colorId:'missing',base64:png(),garmentOnly:true},adminToken)).status,400);
- const ready=await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(),garmentOnly:true},adminToken);assert.equal(ready.status,201);
+ assert.equal((await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(true),garmentOnly:true,sourceImage:'/assets/blazer.webp'},adminToken)).status,400);
+ assert.equal((await req('cutouts','POST',{productId:pid,colorId:'missing',base64:png(),garmentOnly:true,sourceImage:'/assets/blazer.webp'},adminToken)).status,400);
+ const ready=await req('cutouts','POST',{productId:pid,colorId:'wine',base64:png(),garmentOnly:true,sourceImage:'/assets/blazer.webp'},adminToken);assert.equal(ready.status,201);
  const listed=(await req('cutouts','GET',null,'')).data.cutouts;assert.ok(listed.some(x=>x.productId===pid&&x.colorId==='wine'&&x.imageUrl===ready.data.imageUrl));
  const approved=await req('looks','POST',{...look,layers:[{...l,image:ready.data.imageUrl}]});assert.equal(approved.status,201);
  assert.equal((await req('looks','POST',{...look,layers:[{...l,image:'/assets/blazer.webp'}]})).status,409);

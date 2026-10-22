@@ -1,0 +1,129 @@
+[
+  {
+    "productId": 1,
+    "colorId": "",
+    "sourceImage": "/assets/blazer.webp",
+    "key": "1-e0305ece71364483",
+    "w": 112,
+    "h": 121,
+    "name": "کت بلیزر زنانه",
+    "imageUrl": "/assets/garment-cutouts/1-e0305ece71364483.png"
+  },
+  {
+    "productId": 2,
+    "colorId": "",
+    "sourceImage": "/assets/glasses.webp",
+    "key": "2-7cddd0e1fb5466bb",
+    "w": 147,
+    "h": 94,
+    "name": "عینک آفتابی مدل Wayfarer",
+    "imageUrl": "/assets/garment-cutouts/2-7cddd0e1fb5466bb.png",
+    "placement": {
+      "x": 255,
+      "y": 110,
+      "w": 90,
+      "h": 45
+    }
+  },
+  {
+    "productId": 4,
+    "colorId": "",
+    "sourceImage": "/assets/bag.webp",
+    "key": "4-4d7bade020921232",
+    "w": 142,
+    "h": 114,
+    "name": "کیف دوشی زنانه",
+    "imageUrl": "/assets/garment-cutouts/4-4d7bade020921232.png"
+  },
+  {
+    "productId": 6,
+    "colorId": "",
+    "sourceImage": "/assets/shoe.webp",
+    "key": "6-3abc3e8d9fc70316",
+    "w": 149,
+    "h": 89,
+    "name": "کفش اسپرت زنانه",
+    "imageUrl": "/assets/garment-cutouts/6-3abc3e8d9fc70316.png",
+    "placement": {
+      "x": 228,
+      "y": 805,
+      "w": 144,
+      "h": 56.57142857142857
+    }
+  },
+  {
+    "productId": 7,
+    "colorId": "",
+    "sourceImage": "/uploads/e2795b97-01be-4e55-b37d-5d3242596ac4.jpg",
+    "key": "7-7b17dea91075a6cd",
+    "w": 900,
+    "h": 1065,
+    "name": "گوه",
+    "imageUrl": "/assets/garment-cutouts/7-7b17dea91075a6cd.png",
+    "wearable": false
+  },
+  {
+    "productId": 8,
+    "colorId": "e4129b71-a9f1-41ea-8dcb-0403f4cf25f3",
+    "sourceImage": "/uploads/8172efbf-ab59-409e-93e7-8b474d09ab2c.jpg",
+    "key": "8-afa4214d7e651e26",
+    "w": 1130,
+    "h": 1582,
+    "name": "سوتین ابری",
+    "imageUrl": "/assets/garment-cutouts/8-afa4214d7e651e26.png",
+    "placement": {
+      "x": 227.5,
+      "y": 170.10484927916121,
+      "w": 145,
+      "h": 169.89515072083879
+    }
+  },
+  {
+    "productId": 8,
+    "colorId": "84ec5e97-2cd5-4619-8bbd-e2bf6a63ba5f",
+    "sourceImage": "/uploads/88e11b1c-cd61-4e58-a18e-0196163513a5.jpg",
+    "key": "8-a60b2fa8d3d6cd4b",
+    "w": 806,
+    "h": 1029,
+    "name": "سوتین ابری",
+    "imageUrl": "/assets/garment-cutouts/8-a60b2fa8d3d6cd4b.png",
+    "placement": {
+      "x": 227.5,
+      "y": 268.46409574468083,
+      "w": 145,
+      "h": 71.53590425531915
+    }
+  },
+  {
+    "productId": 8,
+    "colorId": "96b73696-1bf4-411f-94d4-b7b20123c44d",
+    "sourceImage": "/uploads/a09c98ad-de37-4f86-b438-4a9169290ba3.jpg",
+    "key": "8-aa82b10050b46209",
+    "w": 1289,
+    "h": 1566,
+    "name": "سوتین ابری",
+    "imageUrl": "/assets/garment-cutouts/8-aa82b10050b46209.png",
+    "placement": {
+      "x": 227.5,
+      "y": 209.5302713987474,
+      "w": 145,
+      "h": 130.4697286012526
+    }
+  },
+  {
+    "productId": 8,
+    "colorId": "517968ca-485d-4afe-b2ee-a8fd1d1846ed",
+    "sourceImage": "/uploads/4172acf5-1a37-4c8d-b4d0-2376ae9b32f4.jpg",
+    "key": "8-72310f5bba05186e",
+    "w": 1289,
+    "h": 1591,
+    "name": "سوتین ابری",
+    "imageUrl": "/assets/garment-cutouts/8-72310f5bba05186e.png",
+    "placement": {
+      "x": 227.5,
+      "y": 179.56451612903226,
+      "w": 145,
+      "h": 160.43548387096774
+    }
+  }
+]
