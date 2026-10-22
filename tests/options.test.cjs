@@ -32,3 +32,10 @@ test('Iranian IBAN checksum and account holder are required before enabling bank
  assert.throws(()=>validateBank({enabled:true,iban:'IR000000000000000000000000',holder:'نام',bank:'بانک'}),{status:400});
  assert.throws(()=>validateBank({enabled:true}),{status:400});assert.equal(validateBank({enabled:false}).enabled,false);
 });
+test('Cosmetic codes exceed 30 without truncation and photos remain bound to their exact code',()=>{
+ const variants=Array.from({length:120},(_,i)=>String(i).padStart(3,'0'));
+ const p=validateProduct({name:'رژ لب',brand:'Daya',cat:'زیبایی',price:100,stock:20,variants,imageUrl:'/assets/lipstick.webp',options:{codeImages:{'000':'/assets/blazer.webp','119':'/assets/bag.webp'}}});
+ assert.equal(p.variants.length,120);assert.deepEqual(p.options.codeImages,{'000':'/assets/blazer.webp','119':'/assets/bag.webp'});
+ assert.equal(Catalog.image(p,{variant:'000'}),'/assets/blazer.webp');assert.equal(Catalog.image(p,{variant:'119'}),'/assets/bag.webp');assert.equal(Catalog.image(p,{variant:'001'}),p.imageUrl);
+ for(const codeImages of [{'120':'/assets/bag.webp'},{'000':'https://bad.test/photo.png'},{'000':'/uploads/../secret.png'}])assert.throws(()=>validateProduct({...p,options:{codeImages}}),{status:400});
+});
