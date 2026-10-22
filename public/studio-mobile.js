@@ -1,0 +1,13 @@
+'use strict';
+(()=>{
+const mq=matchMedia('(max-width: 680px)'),$=s=>document.querySelector(s),body=document.body;let section='pieces';
+const tabs=document.createElement('nav');tabs.className='studio-mobile-tabs';tabs.setAttribute('aria-label','ابزارهای ست‌ساز موبایل');tabs.innerHTML='<button type="button" data-studio-tab="pieces" aria-pressed="true" aria-controls="mobilePieces">لباس‌ها <span>＋</span></button><button type="button" data-studio-tab="options" aria-pressed="false" aria-controls="mobileOptions">رنگ و سایز <span>◉</span></button><button type="button" data-studio-tab="adjust" aria-pressed="false" aria-controls="mobileOptions">چیدمان <span>↔</span></button>';
+const actions=document.createElement('div');actions.className='studio-mobile-actions';actions.innerHTML='<div class="mobile-studio-summary"><span>جمع ست</span><b id="mobileStudioTotal">۰ تومان</b></div><div class="mobile-studio-buttons"></div>';
+body.append(tabs,actions);const save=$('#saveLook'),shop=$('#shopLook'),saveMark=document.createComment('mobile save return point'),shopMark=document.createComment('mobile buy return point');save.before(saveMark);shop.before(shopMark);const pieces=$('.closet-panel'),options=$('.look-panel');pieces.id='mobilePieces';options.id='mobileOptions';
+function setSection(value,focus=false){section=value;body.dataset.studioPanel=value;tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.studioTab===value)));const mobile=mq.matches;pieces.inert=mobile&&value!=='pieces';options.inert=mobile&&value==='pieces';if(focus&&mobile){const target=value==='pieces'?$('#itemSearch'):value==='options'?$('#selectedVariant')||$('#lookName'):$('#layerSlot');target?.focus({preventScroll:true})}}
+function viewport(){if(!window.visualViewport||window.visualViewport.scale===1)body.style.setProperty('--studio-viewport',(window.visualViewport?.height||window.innerHeight)+'px')}
+function mode(){if(mq.matches){actions.querySelector('.mobile-studio-buttons').append(save,shop);save.textContent='ذخیره در کمد ♡';shop.textContent='خرید انتخاب‌ها ←'}else{saveMark.after(save);shopMark.after(shop)}setSection(section);viewport()}
+tabs.addEventListener('click',e=>{const b=e.target.closest('[data-studio-tab]');if(b)setSection(b.dataset.studioTab)});document.addEventListener('dayamora:outfit-item-added',()=>{if(mq.matches)setSection('options')});
+new MutationObserver(()=>{$('#mobileStudioTotal').textContent=$('#lookTotal').textContent}).observe($('#lookTotal'),{childList:true,subtree:true,characterData:true});$('#mobileStudioTotal').textContent=$('#lookTotal').textContent;
+mq.addEventListener('change',mode);window.visualViewport?.addEventListener('resize',viewport);window.addEventListener('resize',viewport);mode();
+})();

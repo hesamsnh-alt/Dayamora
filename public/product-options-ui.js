@@ -2,7 +2,7 @@
 window.ProductOptions={
  mount(p,getVariant,setVariant,onChange){
   const E=Daya.escape,F=n=>Number(n).toLocaleString('fa-IR'),root=document.querySelector('#productOptions');
-  const colors=Catalog.colors(p);let colorId=colors.find(c=>Object.values(c.stock).some(n=>n>0))?.id||colors[0]?.id||'';
+  const colors=Catalog.colors(p);const requestedColor=new URLSearchParams(location.search).get('color');let colorId=colors.find(c=>c.id===requestedColor)?.id||colors.find(c=>Object.values(c.stock).some(n=>n>0))?.id||colors[0]?.id||'';
   root.innerHTML=`${p.cat==='پوشاک'?'<button type="button" class="size-guide-link" id="openSizeGuide">راهنمای سایز و اندازه‌گیری ↗</button>':''}${colors.length?'<div class="variant-label">رنگ انتخابی: <b id="selectedColorName"></b></div><div class="product-color-buttons" id="productColorButtons"></div>':''}<p class="selection-stock" id="selectionStock" role="status" aria-live="polite"></p>`;
   function refresh(){
    const v=getVariant(),n=Catalog.stock(p,v,colorId);
