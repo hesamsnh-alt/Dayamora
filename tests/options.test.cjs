@@ -32,3 +32,13 @@ test('Iranian IBAN checksum and account holder are required before enabling bank
  assert.throws(()=>validateBank({enabled:true,iban:'IR000000000000000000000000',holder:'نام',bank:'بانک'}),{status:400});
  assert.throws(()=>validateBank({enabled:true}),{status:400});assert.equal(validateBank({enabled:false}).enabled,false);
 });
+test('Independent clothing size inventory preserves measurements and reserves/restores exact sizes',()=>{
+ const base={name:'لباس چندسایز',brand:'',cat:'پوشاک',price:100,stock:99,variants:['M','L','XL'],imageUrl:'/assets/blazer.webp',options:{shippingFee:250,sizeStock:{M:2,L:0,XL:5},sizeGuide:{body:[{size:'M',upperBust:'80-84',bust:'86-90',waist:'68-72',hips:'92-96',height:'160-165'},{size:'XL',bust:'100-104',waist:'82-86'}],garment:[{size:'M',length:'60',shoulder:'38',sleeve:'56'}],note:'اندازه واقعی محصول'}}};
+ const p={id:20,...validateProduct(base)};assert.equal(p.stock,7);assert.equal(Catalog.stock(p,'L',''),0);assert.equal(p.options.shippingFee,250);assert.equal(p.options.sizeGuide.body[0].upperBust,'80-84');assert.equal(p.options.sizeGuide.garment[0].sleeve,'56');
+ const items=[{id:20,variant:'XL',qty:3}];assert.ok(Catalog.canAdd(p,[],items[0],3));assert.ok(!Catalog.canAdd(p,[],{id:20,variant:'L'},1));assert.ok(!Catalog.canAdd(p,[{id:20,variant:'M',qty:2}],{id:20,variant:'M'},1));
+ assert.throws(()=>checkCart(p,[{id:20,variant:'M',qty:3}]),{status:409});const reserved=adjust(structuredClone(p),items,-1);assert.equal(reserved.stock,4);assert.equal(reserved.options.sizeStock.XL,2);assert.equal(reserved.options.sizeStock.M,2);assert.deepEqual(adjust(reserved,items,1),p);
+ const reloaded=validateProduct({...base,options:JSON.parse(JSON.stringify(p.options))});assert.deepEqual(reloaded.options.sizeGuide,p.options.sizeGuide);
+ const F=require('../public/catalog-filters.js'),D=require('../public/discovery-core.js');assert.equal(F.matches(p,{size:'L'}),false);assert.equal(F.matches(p,{size:'XL'}),true);assert.equal(F.choice(p,{size:'L'}),null);assert.equal(D.selection({...p,options:{...p.options,sizeStock:{M:0,L:0,XL:5}}}).variant,'XL');
+ for(const sizeStock of [{M:-1},{M:1.5},{XXL:4},{M:1000000,XL:1},[]])assert.throws(()=>validateProduct({...base,options:{sizeStock}}),{status:400});
+ assert.throws(()=>validateProduct({...base,options:{sizeStock:{M:2},colors:[{id:'red',name:'قرمز',hex:'#ff0000',stock:{M:1}}]}}),{status:400});
+});
