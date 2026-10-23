@@ -11,4 +11,6 @@ for(const folder of ['public','lib','netlify/functions','scripts'])for(const nam
 }
 for(const name of ['index','admin','club','setup','product','budget'])if(!fs.existsSync(path.join(root,'public',name+'.html')))throw new Error('Missing page: '+name);
 for(const name of fs.readdirSync(path.join(root,'public')).filter(n=>n.endsWith('.html'))){const html=fs.readFileSync(path.join(root,'public',name),'utf8');if(!html.includes('http-equiv="Content-Security-Policy"'))throw new Error('Missing document policy: '+name)}
+// Verify the actual API connection and admin entry points to catch feature regressions.
+execFileSync(process.execPath,['--test',path.join(root,'tests/admin-import-repair.test.cjs')],{stdio:'inherit'});
 console.log('Syntax and publish folder verified. Build does not need or publish secrets.');
