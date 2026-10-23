@@ -23,12 +23,3 @@
 #brandList .daya-brand-mark.has-logo .daya-brand-wordmark{display:none}
 .daya-brand-wordmark{font:700 11px/1.3 Arial,sans-serif;letter-spacing:0;color:#29344f;max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere}
 #brandList.brands button{min-height:88px}
-
-/* Local logos and full brand captions; no remote requests or overlapping text. */
-#brandList .daya-brand-mark,.brand-directory .daya-brand-mark{position:static;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;height:auto;min-height:56px;padding:0;border-radius:0;background:transparent;overflow:visible}
-#brandList .daya-brand-mark img,.brand-directory .daya-brand-mark img{position:static;display:block;inset:auto;width:76px;height:30px;max-width:100%;object-fit:contain;padding:0;background:transparent}
-#brandList .daya-brand-mark .daya-brand-wordmark,.brand-directory .daya-brand-mark .daya-brand-wordmark{display:block;font:600 12px/1.4 Arial,sans-serif;color:#29344f;letter-spacing:0;white-space:normal;text-align:center;overflow-wrap:anywhere}
-.brand-directory>a{display:flex;align-items:center;justify-content:center;min-width:116px;min-height:88px;padding:12px;border:1px solid #e8dfe4;border-radius:16px;text-decoration:none;color:inherit}
-.brand-directory{display:flex;flex-wrap:wrap;gap:10px}.daya-brand-mark img:not(.daya-brand-loaded){visibility:hidden}
-
-#brandList .daya-brand-mark.has-logo .daya-brand-wordmark,.brand-directory .daya-brand-mark.has-logo .daya-brand-wordmark{display:none}
