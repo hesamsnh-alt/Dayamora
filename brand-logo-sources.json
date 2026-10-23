@@ -1,0 +1,492 @@
+[
+  {
+    "name": "Nike",
+    "slug": "nike",
+    "source": "https://cdn.simpleicons.org/nike"
+  },
+  {
+    "name": "adidas",
+    "slug": "adidas",
+    "source": "https://cdn.simpleicons.org/adidas"
+  },
+  {
+    "name": "Puma",
+    "slug": "puma",
+    "source": "https://cdn.simpleicons.org/puma"
+  },
+  {
+    "name": "New Balance",
+    "slug": "newbalance",
+    "source": "https://cdn.simpleicons.org/newbalance"
+  },
+  {
+    "name": "Converse",
+    "slug": "converse",
+    "source": "https://cdn.worldvectorlogo.com/logos/converse.svg"
+  },
+  {
+    "name": "Vans",
+    "missing": true
+  },
+  {
+    "name": "Reebok",
+    "slug": "reebok",
+    "source": "https://cdn.simpleicons.org/reebok"
+  },
+  {
+    "name": "ASICS",
+    "slug": "asics",
+    "source": "https://cdn.worldvectorlogo.com/logos/asics.svg"
+  },
+  {
+    "name": "Skechers",
+    "slug": "skechers",
+    "source": "https://cdn.worldvectorlogo.com/logos/skechers.svg"
+  },
+  {
+    "name": "Under Armour",
+    "slug": "underarmour",
+    "source": "https://cdn.simpleicons.org/underarmour"
+  },
+  {
+    "name": "Zara",
+    "slug": "zara",
+    "source": "https://cdn.simpleicons.org/zara"
+  },
+  {
+    "name": "H&M",
+    "slug": "handm",
+    "source": "https://cdn.simpleicons.org/handm"
+  },
+  {
+    "name": "Mango",
+    "slug": "mango",
+    "source": "https://cdn.worldvectorlogo.com/logos/mango.svg"
+  },
+  {
+    "name": "Massimo Dutti",
+    "slug": "massimodutti",
+    "source": "https://cdn.worldvectorlogo.com/logos/massimo-dutti-1.svg"
+  },
+  {
+    "name": "Bershka",
+    "slug": "bershka",
+    "source": "https://cdn.worldvectorlogo.com/logos/bershka-1.svg"
+  },
+  {
+    "name": "Pull&Bear",
+    "slug": "pullbear",
+    "source": "https://cdn.worldvectorlogo.com/logos/pull-bear-1.svg"
+  },
+  {
+    "name": "Stradivarius",
+    "slug": "stradivarius",
+    "source": "https://cdn.worldvectorlogo.com/logos/stradivarius-1.svg"
+  },
+  {
+    "name": "Uniqlo",
+    "slug": "uniqlo",
+    "source": "https://cdn.simpleicons.org/uniqlo"
+  },
+  {
+    "name": "COS",
+    "missing": true
+  },
+  {
+    "name": "Levi’s",
+    "slug": "levis",
+    "source": "https://cdn.worldvectorlogo.com/logos/levis-1.svg"
+  },
+  {
+    "name": "Calvin Klein",
+    "slug": "calvinklein",
+    "source": "https://cdn.worldvectorlogo.com/logos/calvin-klein-1.svg"
+  },
+  {
+    "name": "Tommy Hilfiger",
+    "slug": "tommyhilfiger",
+    "source": "https://cdn.worldvectorlogo.com/logos/tommy-hilfiger.svg"
+  },
+  {
+    "name": "Ralph Lauren",
+    "slug": "ralphlauren",
+    "source": "https://cdn.worldvectorlogo.com/logos/ralph-lauren-1.svg"
+  },
+  {
+    "name": "Lacoste",
+    "slug": "lacoste",
+    "source": "https://cdn.worldvectorlogo.com/logos/lacoste.svg"
+  },
+  {
+    "name": "Guess",
+    "slug": "guess",
+    "source": "https://cdn.worldvectorlogo.com/logos/guess-1.svg"
+  },
+  {
+    "name": "Diesel",
+    "slug": "diesel",
+    "source": "https://cdn.worldvectorlogo.com/logos/diesel-1.svg"
+  },
+  {
+    "name": "The North Face",
+    "slug": "thenorthface",
+    "source": "https://cdn.simpleicons.org/thenorthface"
+  },
+  {
+    "name": "Columbia",
+    "missing": true
+  },
+  {
+    "name": "Patagonia",
+    "slug": "patagonia",
+    "source": "https://cdn.worldvectorlogo.com/logos/patagonia.svg"
+  },
+  {
+    "name": "Lululemon",
+    "slug": "lululemon",
+    "source": "https://cdn.worldvectorlogo.com/logos/lululemon-1.svg"
+  },
+  {
+    "name": "Chanel",
+    "slug": "chanel",
+    "source": "https://cdn.worldvectorlogo.com/logos/chanel-1.svg"
+  },
+  {
+    "name": "Dior",
+    "slug": "dior",
+    "source": "https://cdn.simpleicons.org/dior"
+  },
+  {
+    "name": "Gucci",
+    "slug": "gucci",
+    "source": "https://cdn.worldvectorlogo.com/logos/gucci-2.svg"
+  },
+  {
+    "name": "Prada",
+    "slug": "prada",
+    "source": "https://cdn.worldvectorlogo.com/logos/prada-1.svg"
+  },
+  {
+    "name": "Louis Vuitton",
+    "slug": "louisvuitton",
+    "source": "https://cdn.worldvectorlogo.com/logos/louis-vuitton-1.svg"
+  },
+  {
+    "name": "Hermès",
+    "missing": true
+  },
+  {
+    "name": "Saint Laurent",
+    "missing": true
+  },
+  {
+    "name": "Balenciaga",
+    "slug": "balenciaga",
+    "source": "https://cdn.worldvectorlogo.com/logos/balenciaga.svg"
+  },
+  {
+    "name": "Fendi",
+    "slug": "fendi",
+    "source": "https://cdn.worldvectorlogo.com/logos/fendi.svg"
+  },
+  {
+    "name": "Versace",
+    "slug": "versace",
+    "source": "https://cdn.worldvectorlogo.com/logos/versace.svg"
+  },
+  {
+    "name": "Burberry",
+    "slug": "burberry",
+    "source": "https://cdn.worldvectorlogo.com/logos/burberry.svg"
+  },
+  {
+    "name": "Valentino",
+    "slug": "valentino",
+    "source": "https://cdn.worldvectorlogo.com/logos/valentino.svg"
+  },
+  {
+    "name": "Givenchy",
+    "slug": "givenchy",
+    "source": "https://cdn.worldvectorlogo.com/logos/givenchy.svg"
+  },
+  {
+    "name": "Celine",
+    "slug": "celine",
+    "source": "https://cdn.worldvectorlogo.com/logos/celine.svg"
+  },
+  {
+    "name": "Bottega Veneta",
+    "slug": "bottegaveneta",
+    "source": "https://cdn.worldvectorlogo.com/logos/bottega-veneta.svg"
+  },
+  {
+    "name": "Coach",
+    "slug": "coach",
+    "source": "https://cdn.worldvectorlogo.com/logos/coach.svg"
+  },
+  {
+    "name": "Michael Kors",
+    "slug": "michaelkors",
+    "source": "https://cdn.worldvectorlogo.com/logos/michael-kors.svg"
+  },
+  {
+    "name": "Kate Spade",
+    "missing": true
+  },
+  {
+    "name": "Tory Burch",
+    "slug": "toryburch",
+    "source": "https://cdn.worldvectorlogo.com/logos/tory-burch.svg"
+  },
+  {
+    "name": "Longchamp",
+    "missing": true
+  },
+  {
+    "name": "Furla",
+    "slug": "furla",
+    "source": "https://cdn.worldvectorlogo.com/logos/furla.svg"
+  },
+  {
+    "name": "Aldo",
+    "slug": "aldo",
+    "source": "https://cdn.worldvectorlogo.com/logos/aldo.svg"
+  },
+  {
+    "name": "Charles & Keith",
+    "missing": true
+  },
+  {
+    "name": "Ray-Ban",
+    "slug": "rayban",
+    "source": "https://cdn.worldvectorlogo.com/logos/ray-ban.svg"
+  },
+  {
+    "name": "Oakley",
+    "slug": "oakley",
+    "source": "https://cdn.worldvectorlogo.com/logos/oakley.svg"
+  },
+  {
+    "name": "Pandora",
+    "missing": true
+  },
+  {
+    "name": "Swarovski",
+    "slug": "swarovski",
+    "source": "https://cdn.worldvectorlogo.com/logos/swarovski.svg"
+  },
+  {
+    "name": "Cartier",
+    "slug": "cartier",
+    "source": "https://cdn.worldvectorlogo.com/logos/cartier.svg"
+  },
+  {
+    "name": "Tiffany & Co.",
+    "slug": "tiffanyco",
+    "source": "https://cdn.worldvectorlogo.com/logos/tiffany-co.svg"
+  },
+  {
+    "name": "MAC",
+    "missing": true
+  },
+  {
+    "name": "Maybelline",
+    "slug": "maybelline",
+    "source": "https://cdn.worldvectorlogo.com/logos/maybelline.svg"
+  },
+  {
+    "name": "L’Oréal Paris",
+    "missing": true
+  },
+  {
+    "name": "NYX",
+    "slug": "nyxcosmetics",
+    "source": "https://cdn.worldvectorlogo.com/logos/nyx-cosmetics.svg"
+  },
+  {
+    "name": "Fenty Beauty",
+    "slug": "fentybeauty",
+    "source": "https://cdn.worldvectorlogo.com/logos/fenty-beauty.svg"
+  },
+  {
+    "name": "Rare Beauty",
+    "slug": "rarebeauty",
+    "source": "https://cdn.worldvectorlogo.com/logos/rare-beauty-1.svg"
+  },
+  {
+    "name": "Huda Beauty",
+    "missing": true
+  },
+  {
+    "name": "Charlotte Tilbury",
+    "missing": true
+  },
+  {
+    "name": "NARS",
+    "missing": true
+  },
+  {
+    "name": "YSL Beauty",
+    "slug": "yvessaintlaurent",
+    "source": "https://cdn.worldvectorlogo.com/logos/yves-saint-laurent.svg"
+  },
+  {
+    "name": "Sephora",
+    "missing": true
+  },
+  {
+    "name": "Sephora Collection",
+    "missing": true
+  },
+  {
+    "name": "KIKO Milano",
+    "missing": true
+  },
+  {
+    "name": "Essence",
+    "missing": true
+  },
+  {
+    "name": "Catrice",
+    "missing": true
+  },
+  {
+    "name": "e.l.f.",
+    "missing": true
+  },
+  {
+    "name": "The Ordinary",
+    "missing": true
+  },
+  {
+    "name": "CeraVe",
+    "missing": true
+  },
+  {
+    "name": "La Roche-Posay",
+    "slug": "larocheposay",
+    "source": "https://cdn.worldvectorlogo.com/logos/la-roche-posay.svg"
+  },
+  {
+    "name": "Cetaphil",
+    "missing": true
+  },
+  {
+    "name": "Neutrogena",
+    "slug": "neutrogena",
+    "source": "https://cdn.worldvectorlogo.com/logos/neutrogena.svg"
+  },
+  {
+    "name": "Clinique",
+    "slug": "clinique",
+    "source": "https://cdn.worldvectorlogo.com/logos/clinique.svg"
+  },
+  {
+    "name": "Estée Lauder",
+    "missing": true
+  },
+  {
+    "name": "Lancôme",
+    "slug": "lancome",
+    "source": "https://cdn.worldvectorlogo.com/logos/lancome.svg"
+  },
+  {
+    "name": "Kiehl’s",
+    "slug": "kiehls",
+    "source": "https://cdn.worldvectorlogo.com/logos/kiehls-1.svg"
+  },
+  {
+    "name": "Olaplex",
+    "missing": true
+  },
+  {
+    "name": "Moroccanoil",
+    "missing": true
+  },
+  {
+    "name": "Garnier",
+    "slug": "garnier",
+    "source": "https://cdn.worldvectorlogo.com/logos/garnier.svg"
+  },
+  {
+    "name": "Dove",
+    "slug": "dove",
+    "source": "https://cdn.worldvectorlogo.com/logos/dove.svg"
+  },
+  {
+    "name": "Nivea",
+    "slug": "nivea",
+    "source": "https://cdn.worldvectorlogo.com/logos/nivea.svg"
+  },
+  {
+    "name": "Sol de Janeiro",
+    "missing": true
+  },
+  {
+    "name": "Bath & Body Works",
+    "missing": true
+  },
+  {
+    "name": "Victoria’s Secret",
+    "slug": "victoriassecret",
+    "source": "https://cdn.worldvectorlogo.com/logos/victorias-secret.svg"
+  },
+  {
+    "name": "SHEGLAM",
+    "missing": true
+  },
+  {
+    "name": "SHEIN",
+    "slug": "shein",
+    "source": "https://cdn.worldvectorlogo.com/logos/shein-1.svg"
+  },
+  {
+    "name": "Miniso",
+    "missing": true
+  },
+  {
+    "name": "Apple",
+    "slug": "apple",
+    "source": "https://cdn.simpleicons.org/apple"
+  },
+  {
+    "name": "Samsung",
+    "slug": "samsung",
+    "source": "https://cdn.simpleicons.org/samsung"
+  },
+  {
+    "name": "Xiaomi",
+    "slug": "xiaomi",
+    "source": "https://cdn.simpleicons.org/xiaomi"
+  },
+  {
+    "name": "Spigen",
+    "missing": true
+  },
+  {
+    "name": "Casetify",
+    "missing": true
+  },
+  {
+    "name": "Anker",
+    "missing": true
+  },
+  {
+    "name": "Baseus",
+    "missing": true
+  },
+  {
+    "name": "UGREEN",
+    "missing": true
+  },
+  {
+    "name": "JBL",
+    "slug": "jbl",
+    "source": "https://cdn.simpleicons.org/jbl"
+  },
+  {
+    "name": "Sony",
+    "slug": "sony",
+    "source": "https://cdn.simpleicons.org/sony"
+  }
+]

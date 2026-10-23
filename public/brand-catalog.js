@@ -6,26 +6,21 @@ const valid=s=>{const t=String(s||'').trim();return !!t&&!generic.has(t.toLocale
 const match=s=>names.find(n=>n.toLocaleLowerCase('en-US')===String(s||'').trim().toLocaleLowerCase('en-US'));
 const normalize=s=>valid(s)?(match(s)||String(s).trim()):'';
 const all=products=>[...names,...new Set((products||[]).map(p=>normalize(p.brand)).filter(Boolean).filter(b=>!match(b)))];
-/* Brand typography remains local; not a claim of official trademark artwork. */
-const iconSlugs={Nike:'nike',adidas:'adidas',Puma:'puma','New Balance':'newbalance',Converse:'converse',Vans:'vans',Reebok:'reebok',ASICS:'asics',Skechers:'skechers','Under Armour':'underarmour',Zara:'zara','H&M':'handm',Mango:'mango',Uniqlo:'uniqlo','Levi’s':'levis','Calvin Klein':'calvinklein','Tommy Hilfiger':'tommyhilfiger',Lacoste:'lacoste',Diesel:'diesel','The North Face':'thenorthface',Patagonia:'patagonia',Chanel:'chanel',Dior:'dior',Gucci:'gucci',Prada:'prada','Louis Vuitton':'louisvuitton',Versace:'versace',Burberry:'burberry',Valentino:'valentino',Givenchy:'givenchy',Fendi:'fendi',Coach:'coach','Michael Kors':'michaelkors','Ray-Ban':'rayban',Oakley:'oakley',Pandora:'pandora',Swarovski:'swarovski',Cartier:'cartier',Maybelline:'maybelline',SHEGLAM:'sheglam',Sephora:'sephora','Sephora Collection':'sephora',NARS:'nars','The Ordinary':'theordinary',CeraVe:'cerave',Clinique:'clinique','Estée Lauder':'esteelauder',Garnier:'garnier',Dove:'dove',Nivea:'nivea',SHEIN:'shein',Apple:'apple',Samsung:'samsung',Xiaomi:'xiaomi',Spigen:'spigen',Anker:'anker',JBL:'jbl',Sony:'sony'};
-/* Prefer verified, locally stored brand marks. When no local SVG exists,
-   the versioned brand icon service is tried. Never show broken images or initials.
-   Add licensed brand-provided SVG files to public/assets/brand-logos/<slug>.svg. */
+/* Bundled logo paths are generated from the verified local asset manifest. */
+const iconSlugs={"Nike": "nike", "adidas": "adidas", "Puma": "puma", "New Balance": "newbalance", "Converse": "converse", "Reebok": "reebok", "ASICS": "asics", "Skechers": "skechers", "Under Armour": "underarmour", "Zara": "zara", "H&M": "handm", "Mango": "mango", "Massimo Dutti": "massimodutti", "Bershka": "bershka", "Pull&Bear": "pullbear", "Stradivarius": "stradivarius", "Uniqlo": "uniqlo", "Levi’s": "levis", "Calvin Klein": "calvinklein", "Tommy Hilfiger": "tommyhilfiger", "Ralph Lauren": "ralphlauren", "Lacoste": "lacoste", "Guess": "guess", "Diesel": "diesel", "The North Face": "thenorthface", "Patagonia": "patagonia", "Lululemon": "lululemon", "Chanel": "chanel", "Dior": "dior", "Gucci": "gucci", "Prada": "prada", "Louis Vuitton": "louisvuitton", "Balenciaga": "balenciaga", "Fendi": "fendi", "Versace": "versace", "Burberry": "burberry", "Valentino": "valentino", "Givenchy": "givenchy", "Celine": "celine", "Bottega Veneta": "bottegaveneta", "Coach": "coach", "Michael Kors": "michaelkors", "Tory Burch": "toryburch", "Furla": "furla", "Aldo": "aldo", "Ray-Ban": "rayban", "Oakley": "oakley", "Swarovski": "swarovski", "Cartier": "cartier", "Tiffany & Co.": "tiffanyco", "Maybelline": "maybelline", "NYX": "nyxcosmetics", "Fenty Beauty": "fentybeauty", "Rare Beauty": "rarebeauty", "YSL Beauty": "yvessaintlaurent", "La Roche-Posay": "larocheposay", "Neutrogena": "neutrogena", "Clinique": "clinique", "Lancôme": "lancome", "Kiehl’s": "kiehls", "Garnier": "garnier", "Dove": "dove", "Nivea": "nivea", "Victoria’s Secret": "victoriassecret", "SHEIN": "shein", "Apple": "apple", "Samsung": "samsung", "Xiaomi": "xiaomi", "JBL": "jbl", "Sony": "sony"};
 const safeText=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mark=name=>{
  const slug=iconSlugs[name];
  const text='<span class="daya-brand-wordmark">'+safeText(name)+'</span>';
- if(!slug)return '<span class="daya-brand-mark" aria-hidden="true">'+text+'</span>';
+ if(!slug)return '<span class="daya-brand-mark">'+text+'</span>';
  const local='/assets/brand-logos/'+slug+'.svg';
- return '<span class="daya-brand-mark" aria-hidden="true">'+
- '<img src="'+local+'" data-brand-remote="https://cdn.simpleicons.org/'+slug+'" alt="" loading="lazy">'+text+'</span>';
+ return '<span class="daya-brand-mark" role="img" aria-label="'+safeText(name)+'">'+
+ '<img src="'+local+'" alt="" loading="lazy">'+text+'</span>';
 };
 const reveal=img=>{img.classList.add('daya-brand-loaded');img.closest('.daya-brand-mark')?.classList.add('has-logo')};
 document.addEventListener('load',event=>{const img=event.target;if(img instanceof HTMLImageElement&&img.closest('.daya-brand-mark'))reveal(img)},true);
 document.addEventListener('error',event=>{const img=event.target;
  if(!(img instanceof HTMLImageElement)||!img.closest('.daya-brand-mark'))return;
- const remote=img.dataset.brandRemote;
- if(remote){delete img.dataset.brandRemote;img.src=remote;return}
  img.remove();
 },true);
 
