@@ -14,7 +14,7 @@ window.ProductOptions={
   if(document.querySelector('#openSizeGuide'))document.querySelector('#openSizeGuide').onclick=()=>SizeFit.open(p,{stock:size=>Catalog.stock(p,size,colorId),select:size=>{setVariant(size);refresh()},guide:()=>openGuide(p,getVariant(),setVariant,refresh)});
   if(document.querySelector('#openMeasurementGuide'))document.querySelector('#openMeasurementGuide').onclick=()=>openGuide(p,getVariant(),setVariant,refresh);
   const videoRoot=document.querySelector('#productVideoPanel');
-  if(p.options?.videoUrl){ProductVideo.register([p]);videoRoot.innerHTML=`<section class="product-video-panel"><h3>معرفی ویدیویی محصول</h3><p>این محصول را از نزدیک ببین.</p><button type="button" id="openProductVideo" class="small-button" data-product-video="${p.id}">▶ مشاهده ویدیو</button></section>`;}
+  if(p.options?.videoUrl){ProductVideo.register([p]);document.querySelector('.product-photo-main')?.append(videoRoot);ProductVideo.preview(videoRoot,p);}else if(videoRoot){videoRoot.hidden=true;}
 
   if(colors.length&&Catalog.stock(p,getVariant(),colorId)<1){const v=p.variants.find(v=>Catalog.stock(p,v,colorId)>0);if(v)setVariant(v)}
   const initialPhoto=Catalog.color(p,colorId)?.imageUrl;if(initialPhoto){document.querySelector('#mainProductPhoto').src=initialPhoto;document.querySelectorAll('[data-photo]').forEach(b=>b.classList.toggle('selected',b.querySelector('img')?.getAttribute('src')===initialPhoto))}
