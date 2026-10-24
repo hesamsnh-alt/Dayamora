@@ -20,3 +20,19 @@ test('Pricing settings have a persistent admin-header entry and retain the produ
  A.match(node('#portalContent').innerHTML,/id="openFxPricingSettings"/);A.match(node('#adminTab').innerHTML,/id="fxPricingSettings"/);
  node('#openFxPricingSettings').onclick();node('#fxPricingSettings').onclick();A.equal(opened,2);
 });
+test('Product quote replaces a manually entered rate using API, reuses a fresh API quote and never reprices products on opening a form',async()=>{
+ const d=database([{id:1,price:500000,compare_price:null}]);d.settings.set('fx-settings',JSON.stringify({rateIRT:1,rateAsOf:new Date().toISOString(),rateSource:'admin'}));let calls=0;
+ const deps={env:{NETARZ_FX_KEY:'fake'},fetcher:async()=>{calls++;return new Response(JSON.stringify(payload()))}};
+ const q=await F.quote(d.db,deps);A.equal(q.rateIRT,75000);A.equal(q.rateSource,'netarz-sell');A.equal(calls,1);await F.quote(d.db,deps);A.equal(calls,1);A.equal(d.products[0].price,500000);A.ok(!d.writes.some(([sql])=>sql.startsWith('UPDATE products')));
+});
+test('Automatic activation fetches API and enrolls old prices without adding 15% twice; scheduled rises and falls cover both old and AED products',async()=>{
+ const d=database([{id:1,price:500000,compare_price:null},{id:2,price:431250,compare_price:null},{id:3,price:42,compare_price:null,is_sample:1}]);d.settings.set('fx-settings',JSON.stringify({rateIRT:1,rateAsOf:new Date().toISOString(),rateSource:'admin'}));await F.save(d.db,2,{enabled:true,mode:'aed',amountFils:500});
+ let rate=75000;const deps={env:{NETARZ_FX_KEY:'fake'},fetcher:async()=>new Response(JSON.stringify(payload(rate)))};
+ let result=await F.activate(d.db,{confirm:true,includeExisting:true},deps);A.equal(result.enabled,true);A.equal(result.adopted,1);A.equal(d.products[0].price,500000);A.equal(d.products[1].price,431250);A.equal(JSON.parse(d.settings.get('fx-product:1')).baseRateIRT,75000);A.ok(!d.settings.has('fx-product:3'));
+ rate=78000;result=await F.scheduled({...deps,database:{withDatabase:async(w,fn)=>fn(d.db)}});A.equal(result.changed,2);A.equal(d.products[0].price,520000);A.equal(d.products[1].price,448500);
+ rate=72000;await F.scheduled({...deps,database:{withDatabase:async(w,fn)=>fn(d.db)}});A.equal(d.products[0].price,480000);A.equal(d.products[1].price,414000);A.equal(d.products[2].price,42);
+ result=await F.activate(d.db,{confirm:true,includeExisting:true},deps);A.equal(result.adopted,0);A.equal(JSON.parse(d.settings.get('fx-product:1')).baseRateIRT,75000);A.equal(d.products[0].price,480000);
+});
+test('Unconfirmed activation and provider failures cannot alter rates, enrollment or product prices',async()=>{
+ const d=database([{id:1,price:500000,compare_price:null}]);await A.rejects(F.activate(d.db,{confirm:false,includeExisting:true}),{status:400});await A.rejects(F.activate(d.db,{confirm:true,includeExisting:true},{env:{NETARZ_FX_KEY:'fake'},fetcher:async()=>new Response('{}',{status:403})}),{status:503});A.equal(d.writes.length,0);A.equal(d.products[0].price,500000);
+});
