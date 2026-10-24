@@ -6,25 +6,27 @@ window.ProductImport=(()=>{
  function photoColors(data,photo){return Array.isArray(photo.colors)?photo.colors:(data.colorVariants||[]).filter(c=>(c.images||[]).includes(photo.sourceUrl)).map(c=>c.name)}
  function colorPhotos(data,photos){return(data.colors||[]).map(name=>({name,sizes:(data.colorVariants||[]).find(c=>c.name===name)?.sizes||[],imageUrl:photos.find(p=>photoColors(data,p).includes(name)&&p.url)?.url||''})).filter(c=>c.imageUrl)}
  async function prepare(url,{api=Daya.api,onStage=()=>{},acceptPhoto=async base64=>({base64}),previewData=null}={}){
-  onStage('دریافت اطلاعات و عکس‌های محصول…');const data=previewData||await api('/api/admin/import-preview',{method:'POST',body:JSON.stringify({url})});const photos=[],warnings=[];
+  onStage('دریافت اطلاعات و عکس‌های محصول…');const data=previewData||await api('/api/admin/import-preview',{method:'POST',body:JSON.stringify({url})});const photos=[],warnings=[];let serviceBlocked=false;
   if(!data.available)return{data,photos,warnings:[data.reason||'دریافت اطلاعات ممکن نبود.'],savedId:null};
   data.sourceSnapshot={title:data.title,description:data.description,brand:data.brand,colors:[...(data.colors||[])],sizes:[...(data.sizes||[])]};
   const originalColors=[...(data.colors||[])],originalSizes=[...(data.sizes||[])];
   let translation;
   // Start the independent translation while photos download; each upload stays sequential.
-  const translating=api('/api/admin/import-translate',{method:'POST',body:JSON.stringify(data)}).then(r=>translation=r).catch(e=>warnings.push(e.message));
+  const translating=api('/api/admin/import-translate',{method:'POST',body:JSON.stringify(data)}).then(r=>translation=r).catch(e=>{warnings.push(e.message);if(e.serviceBlocked)serviceBlocked=true});
   warnings.push(...(data.warnings||[]));
   const urls=[...new Set([...(data.images||[]),...(data.colorVariants||[]).flatMap(c=>c.images||[])])].slice(0,200);data.images=urls;
   if(urls.length===1)warnings.push('فقط یک عکس در داده‌های عمومی منبع پیدا شد؛ کامل بودن گالری و رنگ‌بندی تأیید نشده است.');
   for(let i=0;i<urls.length;i++){
+   if(serviceBlocked)break;
    onStage('آماده‌سازی خودکار عکس '+(i+1)+' از '+urls.length+' و ترجمهٔ فارسی…');
-   try{const image=await api('/api/admin/import-image',{method:'POST',body:JSON.stringify({url:urls[i]})}),photo=await acceptPhoto(image.base64,urls[i]);photo.sourceUrl=urls[i];photo.url=(await api('/api/admin/upload',{method:'POST',body:JSON.stringify({base64:photo.base64})})).imageUrl;photos.push(photo)}catch(e){warnings.push('عکس '+(i+1)+': '+e.message)}
+   try{const image=await api('/api/admin/import-image',{method:'POST',body:JSON.stringify({url:urls[i]})}),photo=await acceptPhoto(image.base64,urls[i]);photo.sourceUrl=urls[i];photo.url=(await api('/api/admin/upload',{method:'POST',body:JSON.stringify({base64:photo.base64})})).imageUrl;photos.push(photo)}catch(e){warnings.push('عکس '+(i+1)+': '+e.message);if(e.serviceBlocked){serviceBlocked=true;break}}
   }
   await translating;
   if(translation){data.title=translation.title;data.description=translation.description;data.suggestedDescription=translation.description;data.category=translation.category;data.colors=translation.colors;data.sizes=translation.sizes;data.translationStatus='translated';data.colorVariants=(data.colorVariants||[]).map(c=>({...c,name:translation.colors[originalColors.indexOf(c.name)]||c.name,sizes:(c.sizes||[]).map(s=>translation.sizes[originalSizes.indexOf(s)]||s)}))}else data.translationStatus='pending';
   if(!photos.length)warnings.push('عکس محصول از منبع دریافت نشد؛ این پیش‌نویس آماده انتشار نیست.');
   const linked=colorPhotos(data,photos);for(const color of data.colors||[])if(!linked.some(c=>c.name===color&&c.imageUrl))warnings.push('عکس مرتبط با رنگ «'+color+'» در منبع مشخص یا قابل دریافت نیست.');
   data.colorPhotos=linked;data.warnings=warnings;
+  if(serviceBlocked)return{data,photos,warnings,savedId:null};
   onStage('ذخیره خودکار پیش‌نویس؛ محصول منتشر نمی‌شود…');
   const payload={automatic:true,sourceUrl:data.url,title:data.title,brand:data.brand,description:data.description,category:data.category,sizes:data.sizes,colors:data.colors,imageUrls:photos.map(p=>p.url),colorPhotos:linked,translationStatus:data.translationStatus,warnings};
   try{const saved=await api('/api/admin/product-imports',{method:'POST',body:JSON.stringify(payload)});return{data,photos,warnings,savedId:saved.id}}catch(e){warnings.push('ذخیره پیش‌نویس انجام نشد: '+e.message);return{data,photos,warnings,savedId:null}}
