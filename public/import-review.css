@@ -1,0 +1,14 @@
+/* Scoped to the existing admin dialog: prevent intrinsic-width fields from pushing it sideways. */
+#portalModal{box-sizing:border-box;max-width:min(780px,calc(100vw - 24px));overflow-x:hidden}
+#portalModalBody,#portalModal .daya-form,#portalModal .daya-form label,#portalModal .daya-form>*,#portalModal fieldset{min-width:0;max-width:100%;box-sizing:border-box}
+#portalModal .form-row{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+#portalModal input,#portalModal textarea,#portalModal select{min-width:0;max-width:100%;box-sizing:border-box}
+#portalModal p{overflow-wrap:anywhere}
+#portalModal .preview-upload{flex-wrap:wrap}
+#portalModal .product-crop{width:100%;min-width:0;background:#fff7fb;border:1px solid #e7d8e3;border-radius:12px;padding:12px;box-sizing:border-box}
+#portalModal .product-crop canvas{display:block;width:auto;max-width:100%;height:auto;max-height:440px;touch-action:none;cursor:crosshair;direction:ltr;margin:auto;border:1px solid #d7ccd4;background:#fff}
+#portalModal .crop-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#portalModal .crop-size,#portalModal .import-readiness{font-size:12px;line-height:1.9}
+#portalModal .import-readiness{background:#fff2e9;border:1px solid #efcfb8;border-radius:10px;padding:12px;color:#77513b}
+#portalModal .import-readiness.ready{background:#edf8f0;border-color:#b8dbc3;color:#315b3d}
+@media(max-width:700px){#portalModal .form-row{grid-template-columns:minmax(0,1fr)}#portalModal{padding:22px 14px}}
