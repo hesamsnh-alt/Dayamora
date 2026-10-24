@@ -16,3 +16,16 @@
 @media(max-width:850px){#sizeGuideDialog .reference-guide-layout{grid-template-columns:1fr}.guide-figures{max-width:520px;margin:0 auto}.reference-size-guide .size-guide-table{table-layout:auto;min-width:390px}.guide-chart-panel{margin-top:5px}}
 @media(max-width:480px){#sizeGuideDialog.reference-size-guide{padding:18px 12px;width:96vw;max-height:94dvh}.guide-dialog-header h2{font-size:20px}.guide-size-bar{gap:10px;padding:14px 0}.guide-size-chips button{min-width:42px;height:33px;padding:6px 12px}.guide-unit{margin-inline-start:0}.guide-figures{gap:0}.measurement-figure figcaption{font-size:10px}.guide-measurement-notice{font-size:10px}.guide-chart-panel .size-guide-tabs button{font-size:12px}}
 .reference-size-guide .measure-label text,.reference-size-guide .measure-caption text{stroke:none}
+
+/* Compact height/weight sizing; existing measurement charts remain available. */
+.size-fit-dialog{width:min(480px,calc(100vw - 24px));max-height:88dvh;overflow:auto;border:0;border-radius:20px;padding:22px;color:#2b324b;background:#fffafc}
+.size-fit-dialog::backdrop{background:rgba(25,29,50,.55)}
+.size-fit-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.size-fit-dialog h2{margin:0}.size-fit-dialog p{line-height:1.8}
+.size-fit-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.size-fit-inputs label{display:grid;gap:7px;min-width:0}
+.size-fit-inputs input{width:100%;min-width:0;padding:12px;border:1px solid #dfcdd9;border-radius:10px;box-sizing:border-box;font:inherit}
+.size-fit-dialog #sizeFitResult{margin-top:16px;padding:12px;border-radius:12px;background:#f5eaf1;line-height:1.9}
+.size-fit-dialog #sizeFitResult:empty{display:none}
+.size-fit-notice{font-size:12px;color:#716276}
+@media(max-width:360px){.size-fit-dialog{padding:16px}.size-fit-inputs{gap:8px}}

@@ -3,7 +3,7 @@ window.ProductOptions={
  mount(p,getVariant,setVariant,onChange){
   const E=Daya.escape,F=n=>Number(n).toLocaleString('fa-IR'),root=document.querySelector('#productOptions');
   const colors=Catalog.colors(p);const requestedColor=new URLSearchParams(location.search).get('color');let colorId=colors.find(c=>c.id===requestedColor)?.id||colors.find(c=>Object.values(c.stock).some(n=>n>0))?.id||colors[0]?.id||'';
-  root.innerHTML=`${p.cat==='پوشاک'?'<button type="button" class="size-guide-link" id="openSizeGuide">راهنمای سایز و اندازه‌گیری ↗</button>':''}${colors.length?'<div class="variant-label">رنگ انتخابی: <b id="selectedColorName"></b></div><div class="product-color-buttons" id="productColorButtons"></div>':''}<p class="selection-stock" id="selectionStock" role="status" aria-live="polite"></p>`;
+  root.innerHTML=`${p.cat==='پوشاک'?'<button type="button" class="size-guide-link" id="openSizeGuide">سایز من با قد و وزن ↗</button><button type="button" class="size-guide-link" id="openMeasurementGuide">جدول اندازه‌های لباس</button>':''}${colors.length?'<div class="variant-label">رنگ انتخابی: <b id="selectedColorName"></b></div><div class="product-color-buttons" id="productColorButtons"></div>':''}<p class="selection-stock" id="selectionStock" role="status" aria-live="polite"></p>`;
   function refresh(){
    const v=getVariant(),n=Catalog.stock(p,v,colorId);
    if(colors.length){document.querySelector('#selectedColorName').textContent=Catalog.color(p,colorId)?.name||'';document.querySelector('#productColorButtons').innerHTML=colors.map(c=>`<button type="button" data-product-color="${E(c.id)}" class="${c.id===colorId?'selected':''} ${Object.values(c.stock).some(n=>n>0)?'':'unavailable'}" aria-pressed="${c.id===colorId}"><span class="catalog-dot" style="--swatch:${E(c.hex)}"></span>${E(c.name)}${Object.values(c.stock).some(n=>n>0)?'':' · ناموجود'}</button>`).join('')}
@@ -11,7 +11,8 @@ window.ProductOptions={
    document.querySelectorAll('[data-variant]').forEach(b=>{const variant=p.variants[+b.dataset.variant],empty=colors.length&&Catalog.stock(p,variant,colorId)<1;b.disabled=!!empty;b.classList.toggle('variant-unavailable',!!empty);b.classList.toggle('selected',variant===v);b.setAttribute('aria-pressed',String(variant===v))});onChange(n);
   }
   root.addEventListener('click',e=>{const b=e.target.closest('[data-product-color]');if(!b)return;colorId=b.dataset.productColor;const c=Catalog.color(p,colorId);if(Catalog.stock(p,getVariant(),colorId)<1){const v=p.variants.find(v=>c.stock[v]>0);if(v)setVariant(v)}const photo=c.imageUrl||p.imageUrl;document.querySelector('#mainProductPhoto').src=photo;document.querySelectorAll('[data-photo]').forEach(b=>b.classList.toggle('selected',b.querySelector('img')?.getAttribute('src')===photo));refresh()});
-  if(document.querySelector('#openSizeGuide'))document.querySelector('#openSizeGuide').onclick=()=>openGuide(p,getVariant(),setVariant,refresh);
+  if(document.querySelector('#openSizeGuide'))document.querySelector('#openSizeGuide').onclick=()=>SizeFit.open(p,{stock:size=>Catalog.stock(p,size,colorId),select:size=>{setVariant(size);refresh()},guide:()=>openGuide(p,getVariant(),setVariant,refresh)});
+  if(document.querySelector('#openMeasurementGuide'))document.querySelector('#openMeasurementGuide').onclick=()=>openGuide(p,getVariant(),setVariant,refresh);
   const videoRoot=document.querySelector('#productVideoPanel');
   if(p.options?.videoUrl){ProductVideo.register([p]);videoRoot.innerHTML=`<section class="product-video-panel"><h3>معرفی ویدیویی محصول</h3><p>این محصول را از نزدیک ببین.</p><button type="button" id="openProductVideo" class="small-button" data-product-video="${p.id}">▶ مشاهده ویدیو</button></section>`;}
 

@@ -7,7 +7,7 @@
     "start": "node server.cjs",
     "dev:local": "node server-sqlite.cjs",
     "db:init": "node scripts/db-init.cjs",
-    "test": "node --test tests/unit.test.cjs tests/cloud.test.cjs tests/campaign.test.cjs tests/options.test.cjs tests/outfit.test.cjs tests/garment-mask.test.cjs tests/discovery.test.cjs tests/coupons.test.cjs tests/cutout-registry.test.cjs tests/payment-metadata.test.cjs tests/catalog-filters.test.cjs tests/journal.test.cjs tests/account-recovery.test.cjs tests/journal-stylist-loading.test.cjs tests/admin-import-repair.test.cjs tests/auto-import.test.cjs tests/translation-diagnostics.test.cjs tests/import-review-crop.test.cjs",
+    "test": "node --test tests/unit.test.cjs tests/cloud.test.cjs tests/campaign.test.cjs tests/options.test.cjs tests/outfit.test.cjs tests/garment-mask.test.cjs tests/discovery.test.cjs tests/coupons.test.cjs tests/cutout-registry.test.cjs tests/payment-metadata.test.cjs tests/catalog-filters.test.cjs tests/journal.test.cjs tests/account-recovery.test.cjs tests/journal-stylist-loading.test.cjs tests/admin-import-repair.test.cjs tests/auto-import.test.cjs tests/translation-diagnostics.test.cjs tests/import-review-crop.test.cjs tests/fx-pricing.test.cjs tests/size-fit.test.cjs",
     "test:local": "node --test tests/integration.test.cjs",
     "build": "node scripts/check-build.cjs",
     "test:cloud": "node --test tests/features-cloud.test.cjs tests/outfit-cloud.test.cjs"
