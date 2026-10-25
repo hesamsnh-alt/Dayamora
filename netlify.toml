@@ -15,6 +15,9 @@
   # production packages explicitly rather than relying only on tracing.
   included_files = ["node_modules/**"]
 
+[functions."seo"]
+  included_files = ["public/product.html", "public/journal.html", "public/discover.html", "public/budget.html", "public/journal-core.js"]
+
 [[redirects]]
   from = "/admin"
   to = "/admin.html"
@@ -30,10 +33,6 @@
 [[redirects]]
   from = "/budget"
   to = "/budget.html"
-  status = 200
-[[redirects]]
-  from = "/product"
-  to = "/product.html"
   status = 200
 
 [[headers]]

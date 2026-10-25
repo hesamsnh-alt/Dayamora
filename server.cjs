@@ -19,6 +19,11 @@ const server=http.createServer(async(req,res)=>{
       const request=new Request(url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body:req,duplex:'half'}:{})});
       const response=await handle(request,{ip:req.socket.remoteAddress,allowSetup:true});res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));
     }
+    if(['/product','/product.html','/journal.html','/discover/journal','/sitemap.xml','/shop','/budget','/budget.html','/value'].includes(url.pathname)){
+      const seo=require('./lib/seo.cjs');
+      const response=await seo.createHandler({template:name=>fs.readFileSync(path.join(PUBLIC,name+'.html'),'utf8'),get:async endpoint=>{const r=await handle(new Request(seo.ORIGIN+endpoint),{ip:'seo-public',allowSetup:false});if(!r.ok)throw Object.assign(Error('Public content unavailable'),{status:r.status});return r.json()}})(new Request(url,{method:req.method}));
+      res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));
+    }
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end()}
     const name=(/^\/discover\/[a-z]+$/.test(url.pathname)?'/discover.html':pages[url.pathname])||decodeURIComponent(url.pathname),file=path.resolve(PUBLIC,'.'+name),relative=path.relative(PUBLIC,file);
     if(relative.startsWith('..')||path.isAbsolute(relative)||relative.split(path.sep).some(p=>p.startsWith('.'))||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}

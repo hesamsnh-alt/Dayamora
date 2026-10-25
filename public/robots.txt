@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /outfit-api/
+Disallow: /private-uploads/
+Disallow: /.netlify/
+
+Sitemap: https://dayamora.com/sitemap.xml
