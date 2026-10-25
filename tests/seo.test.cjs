@@ -53,3 +53,10 @@ test('Branded home identity matches visible shop name and links Dayamora to its 
  const schemas=[...h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];A.equal(schemas.length,1);
  const graph=JSON.parse(schemas[0][1])['@graph'];const website=graph.find(x=>x['@type']==='WebSite');A.equal(website.name,'دایامورا');A.equal(website.alternateName,'Dayamora');A.equal(website.url,'https://dayamora.com/');
 });
+
+test('Brand favicon is declared once in home and dynamic HTML, with real square PNG/ICO assets and organization logo',()=>{
+ const home=template('index'),again=S.head(home,S.productMeta(p));for(const h of [home,again]){A.equal((h.match(/href="\/favicon-96.png"/g)||[]).length,1);A.ok(h.includes('sizes="96x96"'));A.ok(h.includes('href="/favicon.ico"'));A.ok(h.includes('href="/apple-touch-icon.png"'))}
+ for(const [name,size] of [['favicon-96.png',96],['apple-touch-icon.png',180],['dayamora-logo.png',512]]){const b=fs.readFileSync(require('node:path').join(__dirname,'../public',name));A.equal(b.readUInt32BE(16),size);A.equal(b.readUInt32BE(20),size)}
+ const ico=fs.readFileSync(require('node:path').join(__dirname,'../public/favicon.ico'));A.equal(ico.readUInt16LE(2),1);A.ok(ico.readUInt16LE(4)>1);
+ const schema=S.homeSchema()['@graph'].find(x=>x['@type']==='Organization');A.equal(schema.logo.url,'https://dayamora.com/dayamora-logo.png');
+});
