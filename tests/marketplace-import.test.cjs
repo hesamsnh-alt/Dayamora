@@ -47,3 +47,10 @@ test('Video import endpoint authenticates before fetching and registers the stor
 test('Noon image resizing aliases deduplicate while explicit colour association is preserved',()=>{
  const image='https://f.nooncdn.com/p/example.jpg';const p=Preview.extract(script({'@type':'Product',name:'Bag',color:'Black',image:image+'?width=1200'},'application/ld+json')+script({product:{sku:'N123',product_title:'Bag',images:[image]}}),'https://www.noon.com/uae-en/bag/N123/p/');A.deepEqual(p.images,[image]);A.deepEqual(p.colorVariants[0].images,[image]);
 });
+test('Saved Amazon share-link sample resolves its canonical, reads all parseJSON gallery photos and maps real ASIN colour options',()=>{
+ const h=fs.readFileSync(require.resolve('./fixtures/amazon-roborock-gallery.html'),'utf8'),p=Preview.extract(h,'https://amzn.eu/d/037RScM2');
+ A.equal(p.provider,'Amazon');A.match(p.url,/amazon\.ae\/.*\/dp\/B0GLFYWBD5$/);A.equal(p.brand,'roborock');A.equal(p.images.length,10);A.equal(new Set(p.images).size,10);A.deepEqual(p.colors,['Black','White']);A.deepEqual(p.sizes,['Qrevo S Pro']);A.equal(p.colorVariants[0].images.length,9);A.equal(p.colorVariants[1].images.length,1);A.match(p.images[0],/61BlB86pLwL/);A.ok(!p.images.some(u=>u.includes('55_files')));A.equal(p.videos.length,0);A.ok(p.warnings.some(x=>x.includes('HLS')));
+});
+test('Share-link HTML cannot select the Amazon adapter using an untrusted canonical host or an HTTP URL',()=>{
+ for(const href of ['https://amazon.ae.evil.example/dp/B0GLFYWBD5','https://127.0.0.1/dp/B0GLFYWBD5','http://www.amazon.ae/dp/B0GLFYWBD5']){const p=Preview.extract('<link rel="canonical" href="'+href+'"><span id="productTitle">Private</span>','https://amzn.eu/d/share');A.notEqual(p.provider,'Amazon');A.equal(p.images.length,0)}
+});
