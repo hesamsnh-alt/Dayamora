@@ -21,3 +21,5 @@
 #portalModal .import-photo-card fieldset{padding:6px;display:grid;gap:5px}
 #portalModal .import-photo-card fieldset label{display:flex;align-items:center;gap:5px;font-size:13px}
 #portalModal .import-photo-card input[type=checkbox]{width:20px;height:20px;margin:0}
+
+.import-video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.import-video-card{padding:10px;border:1px solid #e9dfe7;border-radius:14px;min-width:0}.import-video-card video,.import-selected-video{display:block;width:100%;max-width:240px;height:180px;object-fit:contain;background:#f6f0f5;border-radius:10px;margin:0 auto 8px}.import-video-card button{width:100%}

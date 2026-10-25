@@ -33,7 +33,8 @@
   if(all.length>200)warnings.push('منبع بیش از ۲۰۰ عکس دارد؛ سقف هر محصول ۲۰۰ عکس است.');
   if(colorVariants.length>20)warnings.push('منبع بیش از ۲۰ رنگ دارد؛ سقف رنگ‌بندی محصول ۲۰ رنگ است.');
   const brand=txt((g.goodsProperty||[]).find(p=>/^(Brand|برند)$/i.test(p.key))?.values?.[0],80);
-  return{url:u.href,available:true,title,description,suggestedDescription:description,brand,category:/\b(shorts?|pants|shirt|dress|skirt|jacket|blouse|leggings|activewear)\b/i.test(title)?'پوشاک':/\b(lip gloss|lipstick|mascara|eyeliner|eyeshadow|makeup|blush|concealer)\b/i.test(title)?'زیبایی':'',images:all.slice(0,200),colors:colorVariants.slice(0,20).map(c=>c.name),sizes:sizes.slice(0,30),colorVariants:colorVariants.slice(0,20),warnings,sourceImageCount:all.length,sourceGalleryCount:main.length,sourceDetailCount:detail.length};
+  const videos=list([].concat(g.video||[],g.videos||[],g.videoGallery||[],store.video||[]).map(v=>typeof v==='string'?v:v?.videoUrl||v?.video_url||v?.url)).filter(v=>/\.(mp4|webm)(?:[?#]|$)/i.test(v));
+  return{videos,url:u.href,available:true,title,description,suggestedDescription:description,brand,category:/\b(shorts?|pants|shirt|dress|skirt|jacket|blouse|leggings|activewear)\b/i.test(title)?'پوشاک':/\b(lip gloss|lipstick|mascara|eyeliner|eyeshadow|makeup|blush|concealer)\b/i.test(title)?'زیبایی':'',images:all.slice(0,200),colors:colorVariants.slice(0,20).map(c=>c.name),sizes:sizes.slice(0,30),colorVariants:colorVariants.slice(0,20),warnings,sourceImageCount:all.length,sourceGalleryCount:main.length,sourceDetailCount:detail.length};
  }
  return{extract};
 });
