@@ -19,3 +19,18 @@ test('Invalid translated fields identify the actual failing constraint without e
  const good={title:'کیف',description:'کیف پارچه‌ای',category:'کیف',colors:[],sizes:[]};
  for(const [change,code] of [[{title:'English'},'TITLE_LANGUAGE'],[{title:'ف'.repeat(161)},'TITLE_LENGTH'],[{description:'Canvas'},'DESCRIPTION_LANGUAGE'],[{category:'other'},'CATEGORY'],[{colors:[{id:0,label:'صورتی'}]},'COLOR_COUNT'],[{sizes:[{id:0,label:'01#'}]},'SIZE_COUNT']])A.throws(()=>T.validate({...good,...change},input),e=>e.status===502&&e.message.includes('TRANSLATION_'+code));
 });
+
+test('Numeric shade and model identifiers in colour options are retained without requiring Persian letters',()=>{
+ const colors=['01#','02#','A','AB-123','4MP'];const data={title:'Camera',description:'Camera',brand:'Example',colors,sizes:[]};
+ const result=T.validate({title:'دوربین',description:'دوربین با مدل‌های درج‌شده',category:'گجت‌ها',colors:colors.map((label,id)=>({id,label:'کد '+label})),sizes:[]},data);
+ A.deepEqual(result.colors,colors);A.equal(result.translationStatus,'translated');
+});
+test('Equivalent Persian colour translations keep distinct source choices and stable IDs instead of rejecting or merging them',()=>{
+ const data={title:'Bag',description:'Bag',brand:'',colors:['Gray','Grey','Pink'],sizes:[]};
+ const result=T.validate({title:'کیف',description:'کیف رنگی',category:'کیف',colors:[{id:2,label:'صورتی'},{id:1,label:'خاکستری'},{id:0,label:'خاکستری'}],sizes:[]},data);
+ A.equal(result.colors.length,3);A.match(result.colors[0],/Gray/);A.match(result.colors[1],/Grey/);A.equal(result.colors[2],'صورتی');A.equal(new Set(result.colors).size,3);A.ok(result.colors.every(c=>c.length<=60));
+});
+test('Descriptive English colour output is still rejected; code exception cannot mark untranslated colours as completed',()=>{
+ const data={title:'Bag',description:'Bag',colors:['White','Red','Blue'],sizes:[]};
+ A.throws(()=>T.validate({title:'کیف',description:'کیف',category:'کیف',colors:data.colors.map((label,id)=>({id,label})),sizes:[]},data),e=>e.status===502&&e.message.includes('TRANSLATION_COLOR_LANGUAGE'));
+});
