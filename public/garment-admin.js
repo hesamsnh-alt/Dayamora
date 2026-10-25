@@ -39,5 +39,5 @@
    $('#batchCutoutStatus').textContent=`${saved} تصویر برای مانکن ثبت شد؛ ${failed} ثبت ناموفق. برای محصولات باقی‌مانده دوباره آماده‌سازی را بزن.`;showColor();
   }finally{busy=false;$('#garmentPanel').inert=false;$('#batchCutoutResults').inert=false;$('#prepareAllCutouts').disabled=false;renderBatch()}
  };
- (async()=>{try{const me=await Daya.api('/api/me');if(me.user?.role!=='admin')throw new Error('ابتدا با حساب مدیر وارد پنل مدیریت شو.');const [catalog,ready]=await Promise.all([Daya.api('/api/admin/dashboard'),Daya.api('/outfit-api/cutouts')]);products=catalog.products.filter(p=>['پوشاک','کیف','کفش','اکسسوری'].includes(p.cat));rows=ready.cutouts;$('#garmentPanel').hidden=false;$('#garmentBatchPanel').hidden=false;list();msg('تصویر هر محصول و هر رنگ را جدا آماده کن.')}catch(e){msg(e.message,true)}})();
+ (async()=>{try{const me=await Daya.api('/api/me');if(me.user?.role!=='admin')throw new Error('ابتدا با حساب مدیر وارد پنل مدیریت شو.');const [catalog,ready]=await Promise.all([Daya.api('/api/admin/dashboard'),Daya.api('/outfit-api/cutouts?all=1')]);products=catalog.products;rows=ready.cutouts;$('#garmentPanel').hidden=false;$('#garmentBatchPanel').hidden=false;list();msg('تصویر هر محصول و هر رنگ را جدا آماده کن.')}catch(e){msg(e.message,true)}})();
 })();

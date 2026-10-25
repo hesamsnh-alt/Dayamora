@@ -1,8 +1,8 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.GarmentBatch=api})(typeof window!=='undefined'?window:this,function(){
  'use strict';
  function key(j){return JSON.stringify([Number(j.productId),j.colorId||'',j.sourceImage])}
- function jobs(products,rows){const out=[],seen=new Set();for(const p of products){
-  if(p.active===false||p.active===0||!['پوشاک','کیف','کفش','اکسسوری'].includes(p.cat))continue;
+ function jobs(products,rows,{includeInactive=false}={}){const out=[],seen=new Set();for(const p of products){
+  if((!includeInactive&&(p.active===false||p.active===0))||!['پوشاک','کیف','کفش','اکسسوری','زیبایی','مراقبت پوست','مراقبت مو','عطر','هدیه','گجت‌ها'].includes(p.cat))continue;
   const colors=p.options?.colors?.length?p.options.colors:[{id:'',name:''}];
   for(const c of colors){const sourceImage=c.imageUrl||p.imageUrl;if(!sourceImage)continue;
    const job={productId:Number(p.id),colorId:c.id||'',colorName:c.name||'',name:p.name,sourceImage,product:p,requiresPhoto:colors.length>1&&!c.imageUrl};

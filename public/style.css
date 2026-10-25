@@ -23,3 +23,5 @@
 #brandList .daya-brand-mark.has-logo .daya-brand-wordmark{display:none}
 .daya-brand-wordmark{font:700 11px/1.3 Arial,sans-serif;letter-spacing:0;color:#29344f;max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere}
 #brandList.brands button{min-height:88px}
+
+.categories{flex-wrap:wrap;gap:14px}.categories .category{flex:0 0 auto}
