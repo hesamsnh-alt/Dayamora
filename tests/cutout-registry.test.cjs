@@ -1,6 +1,6 @@
 const test=require('node:test'),A=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),R=require('../lib/cutout-registry.cjs'),rows=require('../lib/prepared-cutouts.json');
 test('bundled cutouts are validated transparent PNGs and bind to exact product/colour/photo',async()=>{for(const r of rows.filter(x=>x.wearable!==false)){const bytes=fs.readFileSync(path.join(__dirname,'../public',r.imageUrl));require('../lib/cutout-png.cjs').validatePng('data:image/png;base64,'+bytes.toString('base64'));const p={id:r.productId,image_url:r.sourceImage,options:JSON.stringify({colors:r.colorId?[{id:r.colorId,imageUrl:r.sourceImage}]:[]})};A.ok(R.matching(p,r.colorId,r.imageUrl));A.equal(R.matching({...p,image_url:'/uploads/new.jpg',options:JSON.stringify({colors:r.colorId?[{id:r.colorId,imageUrl:'/uploads/new.jpg'}]:[]})},r.colorId,r.imageUrl),undefined)}});
-test('customer page cannot invoke model downloads or manual cutout steps',()=>{const html=fs.readFileSync(path.join(__dirname,'../public/stylist.html'),'utf8'),js=fs.readFileSync(path.join(__dirname,'../public/outfit.js'),'utf8');A.ok(!/garment-segment|garment-mask/.test(html));A.ok(!/GarmentSegment|extractProduct|personalCutout|whiteCut/.test(js));A.ok(!html.includes('برش / پاک'))});
+test('customer page cannot invoke model downloads or manual cutout steps',()=>{const html=fs.readFileSync(path.join(__dirname,'../public/stylist.html'),'utf8'),js=fs.readFileSync(path.join(__dirname,'../public/outfit.js'),'utf8');A.ok(js.includes("if(user?.role==='admin'&&window.GarmentAuto)"));A.ok(!/GarmentSegment|extractProduct|personalCutout|whiteCut/.test(js));A.ok(!html.includes('برش / پاک'))});
 test('Batch queue uses current real products and exact colour-source bindings; replaced photos are prepared again',()=>{
  const B=require('../public/garment-batch.js'),ps=[{id:101,name:'پیراهن',cat:'پوشاک',active:true,imageUrl:'/uploads/a.png',options:{colors:[{id:'red',name:'قرمز',imageUrl:'/uploads/red.png'},{id:'blue',name:'آبی',imageUrl:'/uploads/blue.png'}]}},{id:102,cat:'کفش',active:true,imageUrl:'/uploads/shoe.png'},{id:103,cat:'زیبایی',active:true,imageUrl:'/uploads/lip.png'},{id:104,cat:'کیف',active:false,imageUrl:'/uploads/bag.png'}];
  let jobs=B.jobs(ps,[{productId:101,colorId:'red',sourceImage:'/uploads/red.png',imageUrl:'/uploads/ready.png'}]);A.equal(jobs.length,3);A.equal(jobs[0].colorId,'blue');A.equal(jobs[1].productId,102);
@@ -46,4 +46,17 @@ test('Gadgets can be saved as real products and are available in store navigatio
  A.equal(validateProduct({...p,cat:'گجت'}).cat,'گجت‌ها');
  for(const f of ['public/portal.js','public/product-import.js','public/budget.js','public/app.js','public/index.html','public/budget.html','public/product.html'])A.ok(fs.readFileSync(path.join(__dirname,'..',f),'utf8').includes('گجت‌ها'),f);
  const mask=require('../public/garment-mask.js');A.equal(mask.guess(p),'object');A.equal(require('../public/outfit-core.js').guess(p),'accessory');
+});
+
+test('Automatic fallback tries own gallery sequentially, preserves the catalog source binding and never guesses another colour',async()=>{
+ const B=require('../public/garment-batch.js'),G=require('../public/garment-auto.js');
+ const product={id:987,cat:'پوشاک',imageUrl:'/uploads/front.png',gallery:['/uploads/detail.png','/uploads/back.png']};
+ const job=B.jobs([product],[])[0],seen=[];const value=await G.extractJob(job,async src=>{seen.push(src);if(src.endsWith('front.png'))throw Error('No garment');return{data:'data:image/png;base64,ok'}});
+ A.equal(value.data,'data:image/png;base64,ok');A.deepEqual(seen,['/uploads/front.png','/uploads/detail.png']);A.equal(job.sourceImage,product.imageUrl);
+ const colored={...product,options:{colors:[{id:'red',imageUrl:'/uploads/red.png'},{id:'blue',imageUrl:'/uploads/blue.png'}]}};
+ A.deepEqual(B.jobs([colored],[])[0].sourceImages,['/uploads/red.png']);
+ let calls=0;await A.rejects(G.extractJob(job,async()=>{calls++;throw Object.assign(Error('No model'),{code:'MODEL_UNAVAILABLE'})}));A.equal(calls,1);
+});
+test('Studio refreshes newly prepared cutouts without requiring a reload, and auto preparation is restricted to the admin branch',()=>{
+ const js=fs.readFileSync(path.join(__dirname,'../public/outfit.js'),'utf8');A.ok(js.includes('loadCutouts(true)'));A.ok(js.includes('!document.hidden'));A.ok(js.includes("if(user?.role==='admin'&&window.GarmentAuto)"));A.ok(js.includes("GarmentAuto.start(r.products)"));
 });

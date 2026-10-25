@@ -5,7 +5,7 @@
   if((!includeInactive&&(p.active===false||p.active===0))||!['پوشاک','کیف','کفش','اکسسوری','زیبایی','مراقبت پوست','مراقبت مو','عطر','هدیه','گجت‌ها'].includes(p.cat))continue;
   const colors=p.options?.colors?.length?p.options.colors:[{id:'',name:''}];
   for(const c of colors){const sourceImage=c.imageUrl||p.imageUrl;if(!sourceImage)continue;
-   const job={productId:Number(p.id),colorId:c.id||'',colorName:c.name||'',name:p.name,sourceImage,product:p,requiresPhoto:colors.length>1&&!c.imageUrl};
+   const job={productId:Number(p.id),colorId:c.id||'',colorName:c.name||'',name:p.name,sourceImage,sourceImages:[...new Set([sourceImage,...(colors.length<=1?(p.gallery||[]):[])].filter(x=>typeof x==='string'&&x.startsWith('/')))],product:p,requiresPhoto:colors.length>1&&!c.imageUrl};
    if(rows.some(r=>Number(r.productId)===job.productId&&(r.colorId||'')===job.colorId&&r.sourceImage===sourceImage))continue;
    const k=key(job);if(!seen.has(k)){seen.add(k);out.push(job)}
   }
