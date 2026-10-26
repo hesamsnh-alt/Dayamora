@@ -9,3 +9,5 @@ window.Daya={
  async logout(){await Daya.api('/api/logout',{method:'POST',body:'{}'});location.href='/'},
  async fileData(file){if(!file||file.size>3*1024*1024)throw new Error('عکس باید حداکثر ۳ مگابایت باشد.');return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('خواندن عکس ناموفق بود.'));r.readAsDataURL(file)})}
 };
+// Isolated visit counter and admin statistics; no third-party analytics script.
+if(typeof document!=='undefined'&&document.createElement){const s=document.createElement('script');s.src='/site-traffic.js';s.async=true;document.head.append(s);}
