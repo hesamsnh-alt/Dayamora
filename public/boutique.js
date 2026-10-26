@@ -4,7 +4,7 @@
  let mode='clothing',rows=[],cutouts=[],selected=0,choice={colorId:'',variant:''},photos=[],photoIndex=0,loading=false,busy=false,frame=0,scrollTimer=0,drag=null,orbitOffset=0;
  const normalized=new Map();
  const display=src=>normalized.get(src)?.url||'';
- async function acceptCutout(row){if(!Core.media(row.imageUrl))return;let image=normalized.get(row.imageUrl);if(!image){image=await BoutiqueCutout.normalize(row.imageUrl,{allowPair:Shop.products.find(p=>Number(p.id)===Number(row.productId))?.cat==='کفش'});normalized.set(row.imageUrl,image)}cutouts=cutouts.filter(x=>!(Number(x.productId)===Number(row.productId)&&x.colorId===row.colorId));cutouts.push(row);}
+ async function acceptCutout(row){if(!Core.media(row.imageUrl))return;let image=normalized.get(row.imageUrl);if(!image){image=await BoutiqueCutout.normalize(row.imageUrl,{allowPair:Shop.products.find(p=>Number(p.id)===Number(row.productId))?.cat==='کفش'});if(row.imageUrl.startsWith('/uploads/')&&image.qualityVersion<BoutiqueCutout.QUALITY){URL.revokeObjectURL(image.url);throw Error('برش قدیمی باید با موتور اصلاح‌شده آماده شود.');}normalized.set(row.imageUrl,image)}cutouts=cutouts.filter(x=>!(Number(x.productId)===Number(row.productId)&&x.colorId===row.colorId));cutouts.push(row);}
  const item=()=>rows[selected];
  const status=t=>$('#boutiqueStatus').textContent=t;
  function imageErrors(root){root.querySelectorAll('img').forEach(img=>img.onerror=()=>{img.hidden=true;if(img.id==='focusImage'){$('#photoBadge').textContent='تصویر قابل دریافت نیست.';return}img.parentElement.classList.add('media-error')})}
