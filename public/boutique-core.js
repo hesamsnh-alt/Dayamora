@@ -5,10 +5,9 @@
  function photos(p,colorId,cutouts=[]){const cs=p.options?.colors||[],c=cs.find(c=>c.id===colorId),source=c?.imageUrl||p.imageUrl,out=[];
   const prepared=cutouts.find(r=>Number(r.productId)===Number(p.id)&&r.colorId===(colorId||'')&&r.sourceImage===source&&media(r.imageUrl));
   if(prepared)out.push({src:prepared.imageUrl,label:'نمای آمادهٔ لباس',prepared:true});
-  for(const src of [source,...(cs.length<=1?p.gallery||[]:[])])if(media(src)&&!out.some(x=>x.src===src))out.push({src,label:'عکس '+(out.filter(x=>!x.prepared).length+1),prepared:false});
   return out;
  }
- function initial(p){const cs=p.options?.colors||[],c=cs.find(c=>(p.variants||[]).some(v=>Number(c.stock?.[v])>0))||cs[0],variant=(p.variants||[]).find(v=>c?Number(c.stock?.[v])>0:Number(p.stock)>0)||(p.variants||[])[0]||'';return{colorId:c?.id||'',variant}}
+ function initial(p,ready=[]){const cs=p.options?.colors||[],c=cs.find(c=>photos(p,c.id,ready).length&&(p.variants||[]).some(v=>Number(c.stock?.[v])>0))||cs.find(c=>photos(p,c.id,ready).length)||cs.find(c=>(p.variants||[]).some(v=>Number(c.stock?.[v])>0))||cs[0],variant=(p.variants||[]).find(v=>c?Number(c.stock?.[v])>0:Number(p.stock)>0)||(p.variants||[])[0]||'';return{colorId:c?.id||'',variant}}
  function catalogue(products,mode='clothing'){return mode==='shoes'?products.filter(p=>p.cat==='کفش'&&p.active&&!p.isSample):clothing(products)}
  function filter(products,query,available,mode='clothing'){const q=String(query||'').trim().toLocaleLowerCase('fa');return catalogue(products,mode).filter(p=>(!q||[p.name,p.brand].join(' ').toLocaleLowerCase('fa').includes(q))&&(!available||Number(p.stock)>0))}
  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));

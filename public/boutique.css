@@ -6,3 +6,12 @@
 .focus-title h2{min-width:0;overflow-wrap:anywhere}#backToRack{font-size:10px;color:#8c7485;padding:0 0 8px;min-height:36px}
 
 .shoe-orbit.dragging .rail-piece{transition:none}
+
+/* The trimmed alpha bounds meet the hanger instead of centering in a tall box. */
+.rail-scroll:not(.shoe-orbit) .rail-piece{padding-top:35px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.rail-scroll:not(.shoe-orbit) .rail-piece img{height:220px;object-position:center top;position:relative;z-index:2}
+.rail-scroll:not(.shoe-orbit) .rail-piece::after{z-index:3}
+.rail-scroll:not(.shoe-orbit) .rail-piece::before{z-index:4}
+.rail-scroll:not(.shoe-orbit) .rail-piece .media-error{height:220px;display:grid;place-items:center;width:100%;font-size:10px}
+.focus-stage:has(img[hidden]){min-height:220px;background:transparent;border:1px dashed #d5c4d0}
+@media(max-width:650px){.rail-scroll:not(.shoe-orbit) .rail-piece{padding-top:35px}.rail-scroll:not(.shoe-orbit) .rail-piece img,.rail-scroll:not(.shoe-orbit) .rail-piece .media-error{height:170px}}
