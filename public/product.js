@@ -9,7 +9,45 @@ $('#pageContent').innerHTML=`<div class="crumbs"><a href="/">خانه</a><span>�
  const options=ProductOptions.mount(p,()=>selectedVariant,v=>{selectedVariant=v},n=>{quantity=Math.max(1,Math.min(quantity,n||1,99));$('#quantityValue').textContent=F(quantity);$('#productAdd').disabled=n<1;$('#productAdd').innerHTML=cartIcon+(n>0?'افزودن به سبد خرید':'ناموجود');$('#quantityUp').disabled=quantity>=Math.min(n,99)});options.refresh();
  $('#productAdd').onclick=async()=>{const b=$('#productAdd');b.disabled=true;try{await Shop.add(p.id,selectedVariant,quantity,options.colorId())}catch(e){Shop.toast(e.message,true)}finally{b.disabled=options.stock()<1}};$('#productFavorite').onclick=async()=>{try{const chosen=await Shop.favorite(p.id);$('#productFavorite').classList.toggle('chosen',chosen);$('#productFavorite').setAttribute('aria-pressed',chosen)}catch(e){Shop.toast(e.message,true)}};
  $('#quantityUp').onclick=()=>{quantity=Math.min(quantity+1,options.stock(),99);$('#quantityValue').textContent=F(quantity);options.refresh()};$('#quantityDown').onclick=()=>{quantity=Math.max(1,quantity-1);options.refresh()};$('#expandPhoto').onclick=()=>{$('#expandedPhoto').src=$('#mainProductPhoto').src;$('#photoDialog').showModal()};$('#closePhoto').onclick=()=>$('#photoDialog').close();if($('#jumpReviews'))$('#jumpReviews').onclick=()=>{tab('reviews');$('#tab-reviews').scrollIntoView({behavior:'smooth'})};bindReviewForm();if(location.hash==='#reviews'){tab('reviews');requestAnimationFrame(()=>$('#tab-reviews').scrollIntoView({block:'start'}))}
- document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{$('#mainProductPhoto').src=images[+b.dataset.photo];document.querySelectorAll('[data-photo]').forEach(x=>x.classList.toggle('selected',x===b))});document.querySelectorAll('[data-variant]').forEach(b=>b.onclick=()=>{selectedVariant=p.variants[+b.dataset.variant];document.querySelectorAll('[data-variant]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',x===b)});options.refresh()});document.querySelectorAll('[data-product-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.productTab));document.querySelectorAll('[data-quick-add]').forEach(b=>b.onclick=()=>{const x=Shop.products.find(x=>x.id===+b.dataset.quickAdd);if(x.variants.length>1||Catalog.colors(x).length)location.href='/product?id='+x.id;else Shop.add(x.id,x.variants[0]).catch(e=>Shop.toast(e.message,true))});if(location.hash==='#reviews')tab('reviews')}
+ document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{$('#mainProductPhoto').src=images[+b.dataset.photo];document.querySelectorAll('[data-photo]').forEach(x=>x.classList.toggle('selected',x===b))});document.querySelectorAll('[data-variant]').forEach(b=>b.onclick=()=>{selectedVariant=p.variants[+b.dataset.variant];document.querySelectorAll('[data-variant]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',x===b)});options.refresh()});document.querySelectorAll('[data-product-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.productTab));document.querySelectorAll('[data-quick-add]').forEach(b=>b.onclick=()=>{const x=Shop.products.find(x=>x.id===+b.dataset.quickAdd);if(x.variants.length>1||Catalog.colors(x).length)location.href='/product?id='+x.id;else Shop.add(x.id,x.variants[0]).catch(e=>Shop.toast(e.message,true))});if(location.hash==='#reviews')tab('reviews');setupProductGallery()}
+// Keep thumbnail navigation inside its own viewport; never scroll the document.
+function setupProductGallery(){
+ const gallery=document.querySelector('.product-gallery'),thumbs=gallery?.querySelector('.gallery-thumbs');
+ if(!thumbs||thumbs.parentElement.classList.contains('gallery-rail'))return;
+ const buttons=[...thumbs.querySelectorAll('[data-photo]')],rail=document.createElement('div');
+ rail.className='gallery-rail';thumbs.before(rail);
+ function arrow(label,text,direction){
+  const b=document.createElement('button');b.type='button';b.className='gallery-scroll';b.setAttribute('aria-label',label);b.textContent=text;
+  b.onclick=()=>thumbs.scrollBy({top:direction*Math.max(60,thumbs.clientHeight*.75),behavior:motion()});return b;
+ }
+ const motion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+ const up=arrow('عکس‌های قبلی','⌃',-1),down=arrow('عکس‌های بعدی','⌄',1);
+ thumbs.id='productGalleryThumbs';thumbs.setAttribute('role','group');thumbs.setAttribute('aria-label','عکس‌های محصول؛ برای دیدن بقیه عکس‌ها داخل این نوار حرکت کنید');
+ up.setAttribute('aria-controls',thumbs.id);down.setAttribute('aria-controls',thumbs.id);rail.append(up,thumbs,down);
+ function edges(){
+  const overflow=thumbs.scrollHeight>thumbs.clientHeight+1,top=thumbs.scrollTop>1,bottom=thumbs.scrollTop+thumbs.clientHeight<thumbs.scrollHeight-1;
+  up.disabled=!top;down.disabled=!bottom;rail.dataset.overflow=String(overflow);rail.dataset.above=String(top);rail.dataset.below=String(bottom);
+ }
+ function reveal(b){
+  if(!b)return;const r=b.getBoundingClientRect(),v=thumbs.getBoundingClientRect(),pad=8;
+  if(r.top<v.top+pad)thumbs.scrollBy({top:r.top-v.top-pad,behavior:motion()});
+  else if(r.bottom>v.bottom-pad)thumbs.scrollBy({top:r.bottom-v.bottom+pad,behavior:motion()});
+ }
+ function selection(){buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.classList.contains('selected'))));reveal(buttons.find(b=>b.classList.contains('selected')));}
+ thumbs.addEventListener('scroll',edges,{passive:true});
+ thumbs.addEventListener('focusin',e=>reveal(e.target.closest('[data-photo]')));
+ thumbs.addEventListener('keydown',e=>{
+  const b=e.target.closest('[data-photo]'),i=buttons.indexOf(b);if(i<0)return;
+  const next=e.key==='ArrowDown'?Math.min(i+1,buttons.length-1):e.key==='ArrowUp'?Math.max(i-1,0):e.key==='Home'?0:e.key==='End'?buttons.length-1:-1;
+  if(next<0)return;e.preventDefault();buttons[next].focus({preventScroll:true});buttons[next].click();reveal(buttons[next]);
+ });
+ const observer=new MutationObserver(selection);observer.observe(thumbs,{subtree:true,attributes:true,attributeFilter:['class']});
+ const resize=typeof ResizeObserver==='function'?new ResizeObserver(edges):null;resize?.observe(thumbs);
+ // A product can render again after submitting a review. Release detached observers.
+ const lifecycle=new MutationObserver(()=>{if(!gallery.isConnected){observer.disconnect();resize?.disconnect();lifecycle.disconnect();}});
+ lifecycle.observe(document.querySelector('#pageContent'),{childList:true});
+ requestAnimationFrame(()=>{edges();selection();});
+}
 function tab(name){document.querySelectorAll('[data-product-tab]').forEach(b=>b.classList.toggle('selected',b.dataset.productTab===name));['description','specs','reviews'].forEach(n=>$('#tab-'+n).hidden=n!==name)}
 function reviewsHtml(){const d=productData;return`<h3>نظر مشتریان دایامورا</h3>${d.reviews.length?d.reviews.map(r=>`<article class="review-card"><header><b>${E(r.name)}</b><span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></header><p>${E(r.body)}</p><small>${Daya.date(r.created_at)} · مشتری دارای سفارش تکمیل‌شده</small></article>`).join(''):'<p class="page-store-note">هنوز نظری منتشر نشده است. امتیازها فقط از نظرهای واقعی محاسبه می‌شوند.</p>'}${d.canReview?`<form id="reviewForm" class="review-form"><h3>تجربه‌ات را بگو ♡</h3>${d.myReview?.hidden?'<p class="form-message">نظر قبلی شما توسط مدیر از نمایش عمومی مخفی شده است.</p>':''}<p class="page-store-note">برای هر محصول یک نظر دارید؛ ثبت دوباره، نظر قبلی خودتان را به‌روز می‌کند.</p><fieldset class="star-picker"><legend>امتیاز تو به این محصول</legend>${[1,2,3,4,5].map(n=>`<label class="${n<=(d.myReview?.rating||0)?'active':''}"><span class="pick-star" aria-hidden="true">★</span><input type="radio" name="rating" value="${n}" aria-label="${n} ستاره" required ${n===d.myReview?.rating?'checked':''}><small>${F(n)} ستاره</small></label>`).join('')}</fieldset><textarea name="body" maxlength="2000" required placeholder="کیفیت، تجربه استفاده و پیشنهادت…" aria-label="متن نظر">${E(d.myReview?.body||'')}</textarea><p id="reviewError" class="form-message" role="alert"></p><button class="pink" type="submit">ثبت نظر و امتیاز</button></form>`:Shop.user?'<p class="sample-tag">ثبت نظر بعد از تکمیل سفارش همین محصول توسط فروشگاه فعال می‌شود.</p>':'<p class="sample-tag">برای ثبت نظر، <a href="/club">وارد حساب شوید</a>. نظر فقط برای سفارش تکمیل‌شده فعال است.</p>'}`}
 function bindReviewForm(){if(!$('#reviewForm'))return;$('#reviewForm').addEventListener('change',e=>{if(e.target.name==='rating')$('#reviewForm').querySelectorAll('.star-picker label').forEach(l=>l.classList.toggle('active',Number(l.querySelector('input').value)<=Number(e.target.value)))});$('#reviewForm').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{const data=Object.fromEntries(new FormData(e.target));await Daya.api('/api/products/'+productData.product.id+'/reviews',{method:'POST',body:JSON.stringify({rating:Number(data.rating),body:data.body})});productData=await Daya.api('/api/products/'+productData.product.id);renderProduct();tab('reviews');Shop.toast('نظر و امتیازت ثبت شد ♡')}catch(err){$('#reviewError').textContent=err.message}finally{b.disabled=false}}}loadProduct();
