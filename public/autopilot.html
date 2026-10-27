@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="same-origin">
+ <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'">
+ <title>مرکز اتوپایلت | دایامورا</title><link rel="stylesheet" href="/autopilot/panel.css"><script defer src="/autopilot/panel.js"></script>
+</head>
+<body>
+ <header><a class="wordmark" href="/">daya<span>mora</span></a><span class="edition">مرکز مستقل اتوپایلت</span><a href="/admin" class="back">مدیریت فروشگاه ↗</a></header>
+ <main>
+  <section id="login" class="login card"><span class="eyebrow">DAYAMORA AUTOPILOT</span><h1>دستیار رشد دایامورا</h1><p>پژوهش محصول و پیشنهاد سئو، در فضایی مستقل و زیر نظر شما.</p><form id="login-form"><label>کلید مدیریت اتوپایلت<input id="admin-key" type="password" autocomplete="current-password" required minlength="32" maxlength="256"></label><button type="submit">ورود به اتوپایلت ←</button></form><p class="hint">این کلید مخصوص اتوپایلت است. کلید OpenAI را اینجا وارد نکنید.</p></section>
+  <p id="message" role="status" aria-live="polite"></p>
+  <div id="dashboard" hidden>
+   <section class="hero card"><div><span class="eyebrow">با تصمیم شما پیش می‌رویم</span><h1>از ایده تا پیش‌نویس آمادهٔ بررسی</h1><p>هر پیشنهاد با منبع و اطلاعات نامشخص ذخیره می‌شود. تأیید اینجا، انتشار در فروشگاه نیست.</p></div><div class="controls"><strong id="mode">خاموش</strong><button id="toggle" type="button">روشن‌کردن اتوپایلت</button><button id="logout" class="plain" type="button">خروج</button></div></section>
+   <div class="stats"><section class="card"><span>پیش‌نویس در انتظار</span><strong id="pending">۰</strong></section><section class="card"><span>تخصیص داخلی امروز</span><strong id="daily">$0</strong></section><section class="card"><span>تخصیص داخلی این ماه</span><strong id="monthly">$0</strong></section></div>
+   <p class="hint">مبلغ بالا بودجهٔ احتیاطی هر اجراست، نه هزینهٔ واقعی یا صورتحساب OpenAI. مصرف توکن هر کار جدا ثبت می‌شود.</p>
+   <nav class="tabs" aria-label="بخش‌های اتوپایلت"><button type="button" data-tab="drafts" aria-pressed="true">پیش‌نویس‌ها</button><button type="button" data-tab="settings" aria-pressed="false">تنظیمات و منابع</button><button type="button" data-tab="activity" aria-pressed="false">فعالیت و مصرف</button></nav>
+   <section id="tab-drafts"><div class="section-head"><h2>صف بررسی شما</h2><div class="actions"><button type="button" id="research">پژوهش محصول</button><button type="button" id="seo" class="secondary">بررسی سئو</button><button type="button" id="export" class="plain">خروجی JSON</button></div></div><p class="hint">پژوهش روزانه ساعت ۱۲ و بررسی سئو ساعت ۱۳ به وقت امارات اجرا می‌شود. نتیجهٔ پژوهش، پیشنهاد قابل بررسی است و لزوماً محصول پرفروش تأییدشده نیست.</p><div id="draft-list" class="drafts"></div></section>
+   <section id="tab-settings" class="card" hidden><h2>مسیر رشد را مشخص کنید</h2><form id="settings-form"><label>موضوع پژوهش<textarea id="brief" rows="4" maxlength="1200" required></textarea></label><label>دامنه‌های مجاز؛ هر خط یک دامنه بدون https<textarea id="domains" rows="4" dir="ltr" required></textarea></label><p class="hint">آمازون، نون و تمو صرفاً دامنهٔ جست‌وجو هستند. دسترسی، مجوز استفاده از محتوا و صحت اطلاعات هر پیشنهاد باید بررسی شود.</p><label>صفحات عمومی برای پیشنهاد سئو؛ هر خط یک مسیر<textarea id="paths" rows="4" dir="ltr" required></textarea></label><p class="hint">مثال: / و /product?id=9. حداکثر ۵ صفحه؛ متن عمومی صفحات خوانده می‌شود و نتیجه فقط در اتوپایلت ذخیره می‌شود.</p><div class="fields"><label>حداکثر اجرای روزانه<input id="daily-units" type="number" min="1" max="12" required></label><label>حداکثر اجرای ماهانه<input id="monthly-units" type="number" min="1" max="2000" required></label></div><p class="hint">برای هر اجرا ۰٫۲۵ دلار بودجهٔ داخلی کنار گذاشته می‌شود و در خطا یا توقف هم آزاد نمی‌شود. درخواست تکراری خودکار به OpenAI ارسال نمی‌شود. سقف صورتحساب را در حساب OpenAI هم کنترل کنید.</p><button type="submit" id="save-settings">ذخیرهٔ تنظیمات</button><p id="settings-note" class="hint"></p></form></section>
+   <section id="tab-activity" hidden><div class="card"><h2>کارها و مصرف توکن</h2><div id="job-list"></div></div><div class="card"><h2>گزارش رویدادها</h2><div id="log-list"></div></div></section>
+  </div>
+ </main><footer>مرکز مستقل اتوپایلت دایامورا · انتشار محصول با بررسی مدیریت فروشگاه</footer>
+</body></html>
