@@ -38,3 +38,9 @@
   }
   const host=document.querySelector('#portalContent');if(host){new MutationObserver(mount).observe(host,{childList:true,subtree:true});mount();}
 })();
+
+// Optional interaction module; failure cannot interrupt the original visit counter.
+if(typeof document.createElement==='function'){
+ const core=document.createElement('script');core.src='/site-interactions-core.js';core.async=true;
+ core.onload=()=>{const s=document.createElement('script');s.src='/site-interactions.js';s.async=true;document.head.append(s);};document.head.append(core);
+}
