@@ -18,7 +18,15 @@
  }
  function cleanSpecks(rgba,w,h){const seen=new Uint8Array(w*h),queue=new Int32Array(w*h);let solid=0;for(let i=0;i<w*h;i++)if(rgba[i*4+3]>8)solid++;else rgba[i*4+3]=0;const limit=Math.max(3,Math.floor(solid*.001));for(let i=0;i<w*h;i++){if(seen[i]||rgba[i*4+3]<=8)continue;let head=0,tail=1;queue[0]=i;seen[i]=1;while(head<tail){const k=queue[head++],x=k%w,y=Math.floor(k/w);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const n=ny*w+nx;if(!seen[n]&&rgba[n*4+3]>8){seen[n]=1;queue[tail++]=n}}}if(tail<limit)for(let k=0;k<tail;k++)rgba[queue[k]*4+3]=0;}return rgba;}
  async function normalize(src,options={}){
-  const response=await fetch(src,{credentials:'same-origin',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('تصویر آماده دریافت نشد.');const bytes=await response.arrayBuffer();if(bytes.byteLength>8*1024*1024)throw Error('حجم تصویر آماده زیاد است.');const qualityVersion=version(bytes),inputUrl=URL.createObjectURL(new Blob([bytes]));let image;
+  let bytes;
+  // Local outputs must not be fetched as data:/blob: network requests: the
+  // boutique's restrictive connect-src policy intentionally permits self only.
+  if(src instanceof Blob)bytes=await src.arrayBuffer();
+  else if(typeof src==='string'&&src.startsWith('data:image/png;base64,')){
+   if(src.length>12*1024*1024||!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(src))throw Error('تصویر شفاف معتبر نیست.');
+   const raw=atob(src.slice(src.indexOf(',')+1)),decoded=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)decoded[i]=raw.charCodeAt(i);bytes=decoded.buffer;
+  }else{const response=await fetch(src,{credentials:'same-origin',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('تصویر آماده دریافت نشد.');bytes=await response.arrayBuffer();}
+  if(bytes.byteLength>8*1024*1024)throw Error('حجم تصویر آماده زیاد است.');const qualityVersion=version(bytes),inputUrl=URL.createObjectURL(new Blob([bytes]));let image;
   try{image=await new Promise((resolve,reject)=>{const im=new Image(),timer=setTimeout(()=>{im.onload=im.onerror=null;reject(Error('زمان دریافت تصویر آماده تمام شد.'))},15000);im.onload=()=>{clearTimeout(timer);resolve(im)};im.onerror=()=>{clearTimeout(timer);reject(Error('تصویر آماده دریافت نشد.'))};im.src=inputUrl});}finally{URL.revokeObjectURL(inputUrl);}
   if(image.naturalWidth*image.naturalHeight>16000000)throw Error('تصویر آماده بیش از حد بزرگ است.');
   const scale=Math.min(1,1600/Math.max(image.naturalWidth,image.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(image.naturalWidth*scale);cv.height=Math.round(image.naturalHeight*scale);const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0,cv.width,cv.height);
@@ -28,7 +36,7 @@
   const out=document.createElement('canvas'),pad=2;out.width=x1-x0+1+pad*2;out.height=y1-y0+1+pad*2;out.getContext('2d').drawImage(cv,x0,y0,x1-x0+1,y1-y0+1,pad,pad,x1-x0+1,y1-y0+1);
   let blob=await new Promise(resolve=>out.toBlob(resolve,'image/png'));if(!blob)throw Error('تصویر شفاف آماده نشد.');let data;
   if(options.markQuality){blob=new Blob([stamp(await blob.arrayBuffer())],{type:'image/png'});if(blob.size>3*1024*1024)throw Error('خروجی شفاف از سه مگابایت بیشتر است.');data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('ساخت تصویر شفاف انجام نشد.'));reader.readAsDataURL(blob);});}
-  return{url:URL.createObjectURL(blob),width:out.width,height:out.height,qualityVersion:options.markQuality?QUALITY:qualityVersion,...(data?{data}:{})};
+  return{blob,url:URL.createObjectURL(blob),width:out.width,height:out.height,qualityVersion:options.markQuality?QUALITY:qualityVersion,...(data?{data}:{})};
  }
  return{inspect,normalize,cleanSpecks,version,stamp,QUALITY};
 });

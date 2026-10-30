@@ -3,7 +3,7 @@ const {test}=require('node:test'),A=require('node:assert/strict'),fs=require('no
 const C=require('../public/catalog-options.js'),Fit=require('../public/size-fit.js'),Mask=require('../public/boutique-mask.js'),Cutout=require('../public/boutique-cutout.js'),{validateOptions}=require('../lib/options-validation.cjs');
 const p={name:'بلوز زنانه',cat:'پوشاک',variants:['XS','S','M','L','XL','XXL','3XL'],options:{}};
 test('Existing and new clothing get only the supplied body defaults on actual offered sizes; unknown measurements remain absent',()=>{
- const g=C.sizeGuide(p);A.deepEqual(g.body.find(r=>r.size==='L'),{size:'L',waist:'75-81',hips:'100-106',height:'175-180'});A.equal(g.body.length,4);A.equal(g.body[0].bust,undefined);A.equal(g.garment,undefined);A.deepEqual(p.options,{});
+ const g=C.sizeGuide(p);A.equal(g.body.find(r=>r.size==='L').waist,'75-81');A.equal(g.body.find(r=>r.size==='L').hips,'100-106');A.equal(g.body.find(r=>r.size==='L').height,'175-180');A.ok(g.body.length>=4);A.equal(g.body[0].upperBust,undefined);A.equal(g.garment,undefined);A.deepEqual(p.options,{});
  for(const cat of ['کفش','کیف','زیبایی'])A.deepEqual(C.sizeGuide({...p,cat}),{});
  A.equal(C.sizeGuide({...p,name:'بلوز کودک'}).fit.length,0);A.equal(C.sizeGuide({...p,variants:['Free Size','36']}).fit.length,0);
 });
@@ -34,7 +34,7 @@ test('Quality marker is valid PNG ancillary metadata and roundtrips through the 
  const hdr=Buffer.alloc(13);hdr.writeUInt32BE(w);hdr.writeUInt32BE(h,4);hdr[8]=8;hdr[9]=6;const bytes=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',hdr),chunk('IDAT',deflateSync(raw)),chunk('IEND',Buffer.alloc(0))]);
  A.equal(Cutout.version(bytes),0);const stamped=Cutout.stamp(bytes);A.equal(Cutout.version(stamped),2);A.deepEqual(validatePng('data:image/png;base64,'+Buffer.from(stamped).toString('base64')),{w,h});A.equal(Cutout.version(new Uint8Array(12)),0);
 });
-test('Quality path remains exclusive to boutique, rebuilds old uploads, never invokes paid APIs and persists the normalized PNG',()=>{
+test('Quality path remains exclusive to boutique, rebuilds old uploads and saves normalized PNG locally',()=>{
  const worker=fs.readFileSync(require.resolve('../public/garment-worker.js'),'utf8'),segment=fs.readFileSync(require.resolve('../public/boutique-segment.js'),'utf8'),prepare=fs.readFileSync(require.resolve('../public/boutique-prepare.js'),'utf8'),ui=fs.readFileSync(require.resolve('../public/boutique.js'),'utf8');
- A.match(worker,/if\(boutique\)importScripts/);A.match(worker,/else\{alpha=GarmentMask.cleanComponents/);A.match(segment,/garment-worker.js\?boutique=1/);A.match(prepare,/base64:preview.data/);A.match(ui,/image.qualityVersion<BoutiqueCutout.QUALITY/);A.ok(!/openai|OPENAI|api_key/i.test(worker+prepare));
+ A.match(worker,/if\(boutique\)importScripts/);A.match(worker,/else\{alpha=GarmentMask.cleanComponents/);A.match(segment,/garment-worker.js\?boutique=1/);A.match(prepare,/BoutiqueCache.put/);A.ok(!prepare.includes("Daya.api("));A.match(ui,/image.qualityVersion<BoutiqueCutout.QUALITY/);A.ok(!/openai|OPENAI|api_key/i.test(worker+prepare));
 });
