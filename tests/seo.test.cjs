@@ -60,3 +60,24 @@ test('Brand favicon is declared once in home and dynamic HTML, with real square 
  const ico=fs.readFileSync(require('node:path').join(__dirname,'../public/favicon.ico'));A.equal(ico.readUInt16LE(2),1);A.ok(ico.readUInt16LE(4)>1);
  const schema=S.homeSchema()['@graph'].find(x=>x['@type']==='Organization');A.equal(schema.logo.url,'https://dayamora.com/dayamora-logo.png');
 });
+
+test('Instagram tracking resolves to the indexable category canonical; real filters and empty categories are noindex',async()=>{
+ const tracked=new URL('/shop',S.ORIGIN);tracked.searchParams.set('cat','پوشاک');tracked.searchParams.set('utm_source','instagram');tracked.searchParams.set('utm_medium','social');
+ const html=await(await handle(new Request(tracked))).text();A.match(html,/content="index,follow/);A.ok(html.includes('/shop?cat='+encodeURIComponent('پوشاک')+'"'));A.ok(!html.includes('utm_source'));A.ok(html.includes('راهنمای انتخاب از این دسته'));
+ tracked.searchParams.set('q','missing');A.match(await(await handle(new Request(tracked))).text(),/content="noindex,follow/);
+ A.match(await(await handle(new Request(S.ORIGIN+'/shop?cat='+encodeURIComponent('عطر')))).text(),/content="noindex,follow/);
+});
+
+test('Categories surface every public product link before JS, with links to other populated categories',async()=>{
+ const rows=Array.from({length:65},(_,i)=>({...p,id:100+i}));rows.push({...p,id:200,cat:'کفش'},{...p,id:201,isSample:true});
+ const h=S.createHandler({template,get:async()=>({products:rows})});
+ const html=await(await h(new Request(S.ORIGIN+'/shop?cat='+encodeURIComponent('پوشاک')))).text();
+ A.equal((html.match(/href="\/product\?id=/g)||[]).length,65);
+ A.match(html,/<summary>محصولات بیشتر این فهرست/);A.ok(html.includes('/product?id=164'));A.ok(!html.includes('/product?id=201'));
+ A.ok(html.includes('/shop?cat='+encodeURIComponent('کفش')));A.ok(!html.includes('/shop?cat='+encodeURIComponent('عطر')));
+});
+
+test('Home title and search/share descriptions agree with public shop metadata',()=>{
+ const h=template('index');A.ok(h.includes('<title>'+S.HOME+'</title>'));A.ok(h.includes('property="og:title" content="'+S.HOME+'"'));
+ A.ok(h.includes('name="description" content="'+S.DESC+'"'));A.ok(h.includes('property="og:description" content="'+S.DESC+'"'));
+});
