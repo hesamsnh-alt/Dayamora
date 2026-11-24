@@ -3,3 +3,5 @@
 .first-visit-intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#fff8fa}
 .first-visit-intro video{display:block;width:min(90vw,496px);height:auto;max-height:82dvh;object-fit:contain}
 .first-visit-intro button{position:absolute;bottom:max(1.5rem,env(safe-area-inset-bottom));border:1px solid #d6b6c6;border-radius:100px;background:white;color:#422a39;padding:.6rem 1.15rem;cursor:pointer}
+.home-animation{display:grid;justify-items:center;margin:clamp(1rem,3vw,2rem) auto}
+.home-animation video{display:block;width:min(100%,340px);height:auto;aspect-ratio:1;object-fit:contain;border-radius:1.25rem;background:#fff8fa}

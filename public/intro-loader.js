@@ -23,3 +23,17 @@
  video.src='/assets/first-visit-intro.mp4';
  video.play().catch(close);
 })();
+
+addEventListener('DOMContentLoaded',()=>{
+ const video=document.getElementById('homeAnimation');
+ if(!video||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const intro=document.getElementById('first-visit-intro');
+ const play=()=>{video.muted=true;video.play().catch(()=>{});};
+ if(!intro||intro.hidden){play();return;}
+ const observer=new MutationObserver(()=>{
+  if(!intro.hidden)return;
+  observer.disconnect();
+  play();
+ });
+ observer.observe(intro,{attributes:true,attributeFilter:['hidden']});
+},{once:true});
