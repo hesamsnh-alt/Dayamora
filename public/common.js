@@ -2,6 +2,7 @@
 window.Daya={
  escape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))},
  money(v){return Number(v).toLocaleString('fa-IR')+' تومان'},
+ promo(p){return p?.blackFriday?.percent===8?'<span class="black-friday-price">۸٪ تخفیف بلک‌فرایدی</span>':''},
  date(v){return new Date(v).toLocaleString('fa-IR')},
  status(v){return({pending:'در انتظار بررسی',confirmed:'تأییدشده',completed:'تکمیل‌شده',cancelled:'لغوشده'})[v]||v},
  async api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const type=r.headers.get('content-type')||'';if(!type.includes('application/json')){const e=new Error(r.status>=500?'بخش سرور فروشگاه هنگام اجرا خطا داده است. لطفاً کمی بعد دوباره امتحان کنید.':r.status===404?'مسیر سرور فروشگاه در دسترس نیست.':'پاسخ سرور فروشگاه معتبر نیست.');e.status=r.status;throw e}const d=await r.json();if(!r.ok){const blocked=d.error==='usage_exceeded';const e=new Error(blocked?'سرویس میزبانی درخواست را با خطای usage_exceeded متوقف کرده است؛ بخش Usage & billing نتلیفای را بررسی کنید.':d.error||'ارتباط با سرور ناموفق بود.');e.status=r.status;e.serviceBlocked=blocked;throw e}return d},
@@ -11,3 +12,6 @@ window.Daya={
 };
 // Isolated visit counter and admin statistics; no third-party analytics script.
 if(typeof document!=='undefined'&&document.createElement){const s=document.createElement('script');s.src='/site-traffic.js';s.async=true;document.head.append(s);}
+
+// Product links from search or social can also be a customer's first visit.
+if(typeof location!=='undefined'&&/^\/(?:product(?:\.html)?|shop|budget(?:\.html)?|value|boutique(?:\.html)?)\/?$/.test(location.pathname)&&typeof document!=='undefined'&&document.createElement){const intro=document.createElement('script');intro.src='/intro-loader.js';intro.async=true;document.head.append(intro);}
